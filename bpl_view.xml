@@ -1,0 +1,482 @@
+<?xml version="1.0"?>
+<openerp>
+  <data>
+		<record model="ir.actions.act_window" id="bpl_officer_registration_action">
+			<field name="name">bpl.officer.action</field>
+			<field name="res_model">bpl.officer</field>
+		</record>
+
+		<record id="bpl_officer_registration_form" model="ir.ui.view">
+			<field name="name">bpl.officer.form</field>
+			<field name="model">bpl.officer</field>
+			<field name="arch" type="xml">
+				<form string="bpl_officer_registration" version="7.0">
+					<sheet>
+						<div class="oe_title">
+							<div class="oe_edit_only">
+								<field name="bpl_company_id" invisible="1" />
+								<field name="bpl_estate_id" invisible="1" />
+								<field name="bpl_division_id" invisible="1" />
+								<label for="name" />
+							</div>
+							<h1>
+								<field name="name" default_focus="1" placeholder="Name" />
+							</h1>
+
+							<field name="nic_no" placeholder="e.g. 645151486V" />
+
+
+						</div>
+						<group>
+							<group>
+								<label for="street" string="Address" />
+								<div>
+									<field name="street" placeholder="Street..." />
+									<field name="street2" />
+									<div class="address_format">
+										<field name="city" placeholder="City" style="width: 40%%" />
+									</div>
+									<field name="country_id" placeholder="Country" class="oe_no_button"
+										options='{"no_open": True}' />
+								</div>
+								<field name="website" widget="url" placeholder="e.g. www.openerp.com" />
+							</group>
+							<group>
+								<field name="phone" placeholder="e.g. +94 777 333 000" />
+								<field name="mobile" />
+								<field name="fax" />
+								<field name="email" widget="email" />
+								<field name="job_position" />
+							</group>
+						</group>
+					</sheet>
+				</form>
+			</field>
+		</record>
+
+
+		<record model="ir.ui.view" id="bpl_worker_registration_form">
+			<field name="name">bpl.worker.form</field>
+			<field name="model">bpl.worker</field>
+			<field name="type">form</field>
+			<field name="arch" type="xml">
+				<form string="bpl_worker_registration">
+					<group>
+						<group>
+							<field name="bpl_company_id" />
+							<field name="bpl_estate_id" />
+							<field name="bpl_division_id" />
+							<field name="register_no" />
+							<field name="employer_no" />
+							<field name="epf_no" placeholder="EPF No" />
+							<field name="emp_no" />
+							<field name="epf" />
+							<field name="nic_no" />
+						</group>
+						<group>
+
+							<field name="name" />
+							<field name="date_of_birth" />
+							<field name="gender" />
+							<field name="is_married" />
+							<field name="spouse_name" attrs="{'invisible':[('is_married','=',False)]}" />
+						</group>
+						<group>
+							<field name="father_name" />
+							<field name="mother_name" />
+							<field name="date_appointed" />
+							<field name="status" />
+							<field name="religion_id" />
+							<field name="festival_id" invisible="1" />
+							<field name="date_of_approval" invisible="1" />
+						</group>
+						<group>
+							<field name="default_work" />
+							<field name="union_id" />
+
+							<field name="address_line_1" />
+							<field name="address_line_2" />
+							<field name="address_line_3" />
+
+							<field name="estate_resident" />
+							<field name="occupation_code" attrs="{'invisible':[('estate_resident','=',False)]}" />
+							<field name="is_active" />
+							<field name="current_status" attrs="{'invisible':[('is_active','=',False)]}" />
+						</group>
+					</group>
+				</form>
+			</field>
+		</record>
+
+		<record id="bpl_worker_registration_tree" model="ir.ui.view">
+			<field name="name">bpl.worker.tree</field>
+			<field name="model">bpl.worker</field>
+			<field name="arch" type="xml">
+				<tree string="bpl_worker_registration">
+					<field name="name" />
+					<field name="register_no" />
+					<field name="nic_no" />
+					<field name="bpl_division_id" />
+					<field name="default_work" />
+				</tree>
+			</field>
+		</record>
+
+		<record model="ir.actions.act_window" id="bpl_worker_registration_action">
+			<field name="name">bpl.worker.action</field>
+			<field name="res_model">bpl.worker</field>
+			<field name="view_type">form</field>
+			<field name="view_mode">tree,form</field>
+		</record>
+
+		<record model="ir.ui.view" id="bpl_religion_registration_form">
+			<field name="name">bpl.religion.form</field>
+			<field name="model">bpl.religion</field>
+			<field name="type">form</field>
+			<field name="arch" type="xml">
+				<form string="bpl_religion_registration">
+					<field name="name" />
+				</form>
+			</field>
+		</record>
+
+		<record model="ir.actions.act_window" id="bpl_religion_registration_action">
+			<field name="name">bpl.religion.action</field>
+			<field name="res_model">bpl.religion</field>
+			<field name="view_type">form</field>
+			<field name="view_mode">form</field>
+		</record>
+
+		<record model="ir.ui.view" id="bpl_festival_registration_form">
+			<field name="name">bpl.festival.form</field>
+			<field name="model">bpl.festival</field>
+			<field name="type">form</field>
+			<field name="arch" type="xml">
+				<form string="bpl_festival_registration">
+					<field name="name" />
+				</form>
+			</field>
+		</record>
+
+		<record model="ir.actions.act_window" id="bpl_festival_registration_action">
+			<field name="name">bpl.festival.action</field>
+			<field name="res_model">bpl.festival</field>
+			<field name="view_type">form</field>
+			<field name="view_mode">form</field>
+		</record>
+
+		<record model="ir.ui.view" id="bpl_union_registration_form">
+			<field name="name">bpl.union.form</field>
+			<field name="model">bpl.union</field>
+			<field name="type">form</field>
+			<field name="arch" type="xml">
+				<form string="bpl_union_registration">
+					<field name="name" />
+				</form>
+			</field>
+		</record>
+
+		<record model="ir.ui.view" id="bpl_company_define_form">
+			<field name="name">bpl.company.define.form</field>
+			<field name="model">bpl.company.define</field>
+			<field name="type">form</field>
+			<field name="arch" type="xml">
+				<form string="bpl_company_define">
+					<field name="department_id" />
+					<field name="is_company" />
+					<field name="min_no" attrs="{'invisible':[('is_company','=',False)]}" />
+					<field name="max_no" attrs="{'invisible':[('is_company','=',False)]}" />
+					<field name="current_no" attrs="{'readonly':[('is_company','=',False)]}" />
+				</form>
+			</field>
+		</record>
+
+		<record model="ir.ui.view" id="bpl_company_define_tree">
+			<field name="name">bpl.company.define.tree</field>
+			<field name="model">bpl.company.define</field>
+			<field name="type">tree</field>
+			<field name="arch" type="xml">
+				<form string="bpl_company_define">
+					<field name="department_id" />
+					<field name="is_company" />
+					<field name="min_no" attrs="{'invisible':[('is_company','=',False)]}" />
+					<field name="max_no" attrs="{'invisible':[('is_company','=',False)]}" />
+					<field name="current_no" readonly="1" />
+				</form>
+			</field>
+		</record>
+
+		<record model="ir.actions.act_window" id="bpl_company_define_action">
+			<field name="name">bpl.company.define.action</field>
+			<field name="res_model">bpl.company.define</field>
+			<field name="view_type">form</field>
+			<field name="view_mode">tree,form</field>
+		</record>
+
+
+		<record model="ir.actions.act_window" id="bpl_union_registration_action">
+			<field name="name">bpl.union.action</field>
+			<field name="res_model">bpl.union</field>
+			<field name="view_type">form</field>
+			<field name="view_mode">form</field>
+		</record>
+
+		<record model="ir.ui.view" id="bpl_employer_epf_form">
+			<field name="name">bpl.employer.epf.form</field>
+			<field name="model">bpl.employer.epf</field>
+			<field name="type">form</field>
+			<field name="arch" type="xml">
+				<form string="bpl_employer_epf">
+					<field name="department_id" />
+					<field name="epf_no" />
+				</form>
+			</field>
+		</record>
+
+		<record id="bpl_employer_epf_tree" model="ir.ui.view">
+			<field name="name">bpl.employer.epf.tree</field>
+			<field name="model">bpl.employer.epf</field>
+			<field name="arch" type="xml">
+				<tree string="bpl_employer_epf">
+					<field name="department_id" />
+					<field name="epf_no" />
+				</tree>
+			</field>
+		</record>
+
+		<record model="ir.actions.act_window" id="bpl_employer_empno_action">
+			<field name="name">bpl.employer.epf.action</field>
+			<field name="res_model">bpl.employer.epf</field>
+			<field name="view_type">form</field>
+			<field name="view_mode">tree,form</field>
+		</record>
+
+
+		<!-- ####################################################Work Offer#################################################### -->
+		<record model="ir.ui.view" id="bpl_work_offer_form">
+			<field name="name">bpl.work.offer.form</field>
+			<field name="model">bpl.work.offer</field>
+			<field name="arch" type="xml">
+				<form string='bpl_work_offer' version='7.0'>
+					<sheet>
+						<group>
+							<group>
+								<field name='bpl_company_id' invisible="1" />
+								<field name='bpl_estate_id' />
+								<field name='bpl_division_id' on_change="onchange_division(bpl_division_id)" />
+								<field name="user_id" invisible="1" />
+								<field name="is_confirmed" invisible="1" />
+							</group>
+							<group>
+								<field name='date_of_offer' />
+								<field name='payment_type' />
+								<field name='select_by' />
+								<field name='no_of_workers' attrs="{'invisible':[('select_by','=','by_name')]}" />
+								<field name='work_type' />
+							</group>
+						</group>
+						<div name="Worker Selection"></div>
+						<separator string='Select workers'
+							attrs="{'invisible':[('select_by','=','by_count')]}" />
+						<notebook attrs="{'invisible':[('select_by','=','by_count')]}">
+							<page string="Tea Workers" attrs="{'readonly':[('work_type','!=','tea')]}">
+								<field name='selected_tea_workers_line_ids' nolabel='1'>
+									<tree string='List' editable='bottom'>
+										<field name='tea_line_worker_id' invisible="1" />
+										<field name='worker_id' />
+										<field name='is_selected' />
+									</tree>
+								</field>
+								<group class='oe_subtotal_footer oe_right'>
+									<field name='total_workers' />
+								</group>
+								<br />
+								<br />
+							</page>
+							<page string="Rubber Workers" attrs="{'readonly':[('work_type','=','rubber')]}">
+								<field name='selected_rubber_workers_line_ids' nolabel='1'>
+									<tree string='List' editable='bottom'>
+										<field name='rubber_line_worker_id' invisible="1" />
+										<field name='worker_id' />
+										<field name='is_selected' />
+									</tree>
+								</field>
+								<group class='oe_subtotal_footer oe_right'>
+									<field name='total_workers' />
+								</group>
+								<br />
+								<br />
+							</page>
+							<page string="Sundry Workers" attrs="{'readonly':[('work_type','=','sundry')]}">
+								<field name='selected_sundry_workers_line_ids' nolabel='1'>
+									<tree string='List' editable='bottom'>
+										<field name='sundry_line_worker_id' invisible="1" />
+										<field name='worker_id' />	
+										<field name='is_selected' />
+									</tree>
+								</field>
+								<group class='oe_subtotal_footer oe_right'>
+									<field name='total_workers' />
+								</group>
+								<br />
+								<br />
+							</page>
+						</notebook>
+					</sheet>
+				</form>
+			</field>
+		</record>
+
+		<record model="ir.actions.act_window" id="bpl_work_offer_action">
+			<field name="name">bpl.work.offer.action</field>
+			<field name="res_model">bpl.work.offer</field>
+			<field name="view_type">form</field>
+			<field name="view_mode">form</field>
+		</record>
+
+		<!-- ################################################################################################## -->
+		<record model="ir.actions.act_window" id="bpl_company_n_registration_action">
+			<field name="name">bpl_company_n_registration</field>
+			<field name="res_model">bpl.company.n.registration</field>
+		</record>
+
+		<record model="ir.actions.act_window" id="bpl_estate_n_registration_action">
+			<field name="name">bpl_estate_n_registration</field>
+			<field name="res_model">bpl.estate.n.registration</field>
+		</record>
+
+		<record model="ir.actions.act_window" id="bpl_sundry_work_registration_action">
+			<field name="name">bpl_sundry_work_registration</field>
+			<field name="res_model">bpl.sundry.work.registration</field>
+		</record>
+
+		<record model="ir.actions.act_window" id="bpl_division_n_registration_action">
+			<field name="name">bpl_division_n_registration</field>
+			<field name="res_model">bpl.division.n.registration</field>
+		</record>
+
+
+		<!-- #################################################### Work Update #################################################### -->
+		<record model="ir.ui.view" id="bpl_work_update_form">
+			<field name="name">bpl.work.update.form</field>
+			<field name="model">bpl.work.update</field>
+			<field name="arch" type="xml">
+				<form string='bpl_work_update' version='7.0'>
+					<sheet>
+						<group>
+							<group>
+
+								<field name='bpl_company_id' invisible="1" />
+								<field name='bpl_estate_id' />
+								<field name='bpl_division_id' />
+							</group>
+							<group>
+								<field name='gang_no' />
+								<field name='offered_date' />
+								<field name='casual_eligible' />
+							</group>
+						</group>
+						<div name="Worker Selection"></div>
+						<separator string='Select Work Offers' />
+						<notebook>
+							<page string="Tea Workers">
+								<field name='selected_tea_workers_update_line_ids'
+									nolabel='1'>
+									<field name='tea_norm' />
+									<tree string='List' editable='bottom'>
+										<field name='epf_no' />
+										<field name='worker_id' />
+										<field name='tea_hrs_worked' />
+										<field name='tea_total_kgs' />
+										<field name='tea_over_kgs' />
+									</tree>
+								</field>
+								<group class='oe_subtotal_footer oe_right'>
+								</group>
+								<br />
+								<br />
+							</page>
+							<page string="Rubber Workers">
+								<field name='selected_rubber_workers_update_line_ids'
+									nolabel='1'>
+									<field name='rubber_norm' />
+									<tree string='List' editable='bottom'>
+										<field name='epf_no' />
+										<field name='worker_id' />
+										<field name='rubber_hrs_worked' />
+										<field name='rubber_total_kgs' />
+										<field name='rubber_over_kgs' />
+										<field name='rubber_scrap_kgs' />
+									</tree>
+								</field>
+								<group class='oe_subtotal_footer oe_right'>
+								</group>
+								<br />
+								<br />
+							</page>
+							<page string="Sundry Workers">
+								<field name='selected_sundry_workers_update_line_ids'
+									nolabel='1'>
+									<tree string='List' editable='bottom'>
+										<field name='epf_no' />
+										<field name='worker_id' />
+										<field name='sundry_hrs_worked' />
+										<field name='sundry_work_id' />
+									</tree>
+								</field>
+								<group class='oe_subtotal_footer oe_right'>
+								</group>
+								<br />
+								<br />
+							</page>
+						</notebook>
+					</sheet>
+				</form>
+			</field>
+		</record>
+
+		<record model="ir.actions.act_window" id="bpl_work_update_action">
+			<field name="name">bpl.work.update.action</field>
+			<field name="res_model">bpl.work.update</field>
+			<field name="view_type">form</field>
+			<field name="view_mode">form</field>
+		</record>
+
+
+
+		<!-- ################################ Work Update################################################################## -->
+
+		<menuitem id="menu_bpl" name="BPL/Registration" />
+		<menuitem id="menu_bpl_ref" name="Reference" parent="menu_bpl" />
+
+		<menuitem id="menu_bpl_worker_registration" name="Worker Registration"
+			parent="menu_bpl" action="bpl_worker_registration_action" sequence="1" />
+		<menuitem id="menu_bpl_officer_registration" name="Officer Registration"
+			parent="menu_bpl" action="bpl_officer_registration_action" sequence="2" />
+		<menuitem id="menu_bpl_work_offer" name="Work Offer" parent="menu_bpl"
+			action="bpl_work_offer_action" sequence="3" />
+		<menuitem id="menu_bpl_work_update" name="Work Update"
+			parent="menu_bpl" action="bpl_work_update_action" sequence="4" />
+
+		<menuitem id="menu_bpl_religion_registration" name="Religion Registration"
+			parent="menu_bpl_ref" action="bpl_religion_registration_action" />
+		<menuitem id="menu_bpl_festival_registration" name="Festival Registration"
+			parent="menu_bpl_ref" action="bpl_festival_registration_action" />
+		<menuitem id="menu_bpl_union_registration" name="Union Registration"
+			parent="menu_bpl_ref" action="bpl_union_registration_action" />
+		<menuitem id="menu_bpl_sundry_work_registration" name="Sundry Work Registration"
+			parent="menu_bpl_ref" action="bpl_sundry_work_registration_action" />
+
+		<menuitem id="menu_bpl_company_define" name="Numbering Unit"
+			parent="menu_bpl_ref" action="bpl_company_define_action" />
+		<menuitem id="menu_bpl_employer_empno" name="Employer No Define"
+			parent="menu_bpl_ref" action="bpl_employer_empno_action" />
+
+		<menuitem name="Company New" parent="menu_bpl_ref"
+			id="bpl_company_n_registration" action="bpl_company_n_registration_action" />
+		<menuitem name="Estate New" parent="menu_bpl_ref"
+			id="bpl_estate_n_registration" action="bpl_estate_n_registration_action" />
+		<menuitem name="Division New" parent="menu_bpl_ref"
+			id="bpl_division_n_registration" action="bpl_division_n_registration_action" />
+	</data>
+</openerp>
