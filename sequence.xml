@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<openerp>
+  <data noupdate="1">
+		<record id="seq_type_bpl_worker_registration" model="ir.sequence.type">
+			<field name="name">bpl_worker_registration_sequence</field>
+			<field name="code">bpl.worker</field>
+		</record>
+
+		<record model="ir.sequence" id="seq_bpl_worker_registration">
+			<field name="name">bpl_worker_registration_sequence</field>
+			<field name="code">bpl.worker</field>
+			<field name="prefix">W</field>
+			<field name="padding">5</field>
+		</record>
+
+	</data>
+</openerp>
