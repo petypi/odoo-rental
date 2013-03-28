@@ -1,6 +1,22 @@
 <?xml version="1.0"?>
 <openerp>
 	<data>
+
+		<record id="bpl_officer_registration_tree" model="ir.ui.view">
+			<field name="name">bpl.officer.tree</field>
+			<field name="model">bpl.officer</field>
+			<field name="arch" type="xml">
+				<tree string="bpl_officer_registration">
+					<field name="job_position" />
+					<field name="name" />
+					<field name="bpl_company_id" />
+					<field name="work_for" />
+					<field name="mobile" />
+				</tree>
+			</field>
+		</record>
+
+
 		<record model="ir.actions.act_window" id="bpl_officer_registration_action">
 			<field name="name">bpl.officer.action</field>
 			<field name="res_model">bpl.officer</field>
@@ -12,41 +28,51 @@
 			<field name="arch" type="xml">
 				<form string="bpl_officer_registration" version="7.0">
 					<sheet>
+						<field name="bpl_company_id" invisible="0" placeholder="Comapany"
+							style="width: 50%%" />
+						<field name="bpl_estate_id" invisible="0" placeholder="Estate"
+							style="width: 50%%" />
+						<field name="bpl_division_id" invisible="0" placeholder="Division"
+							style="width: 50%%" />
+
 						<div class="oe_title">
 							<div class="oe_edit_only">
-								<field name="bpl_company_id" invisible="1" />
-								<field name="bpl_estate_id" invisible="1" />
-								<field name="bpl_division_id" invisible="1" />
 								<label for="name" />
 							</div>
 							<h1>
 								<field name="name" default_focus="1" placeholder="Name" />
 							</h1>
 
-							<field name="nic_no" placeholder="e.g. 645151486V" />
-
-
 						</div>
 						<group>
 							<group>
 								<label for="street" string="Address" />
 								<div>
-									<field name="street" placeholder="Street..." />
-									<field name="street2" />
+									<field name="street" placeholder="Address line 1" />
+									<field name="street2" placeholder="Address line 2" />
 									<div class="address_format">
 										<field name="city" placeholder="City" style="width: 40%%" />
 									</div>
 									<field name="country_id" placeholder="Country" class="oe_no_button"
 										options='{"no_open": True}' />
 								</div>
-								<field name="website" widget="url" placeholder="e.g. www.openerp.com" />
+								<field name="website" widget="url" placeholder="e.g. www.bellvantage.com" />
+								<field name="nic_no" placeholder="e.g. 645151486V" />
+								<field name="emp_no" placeholder="e.g. W00021" />
+								<field name="epf_no" placeholder="e.g. E12001" />
+								<field name="date_of_birth" />
+								<field name="date_of_appointed" />
+
 							</group>
 							<group>
-								<field name="phone" placeholder="e.g. +94 777 333 000" />
-								<field name="mobile" />
-								<field name="fax" />
-								<field name="email" widget="email" />
-								<field name="job_position" />
+								<field name="phone" placeholder="e.g. +94 112 333 000" />
+								<field name="mobile" placeholder="e.g. +94 777 333 000" />
+								<field name="fax" placeholder="e.g. +94 112 333 222" />
+								<field name="email" widget="email" placeholder="e.g. infor@bellvantage.com" />
+								<field name="job_position" placeholder="Finance Manager" />
+								<field name="is_active" />
+								<field name="current_status" attrs="{'invisible':[('is_active','=',False)]}" />
+
 							</group>
 						</group>
 					</sheet>
@@ -61,49 +87,52 @@
 			<field name="type">form</field>
 			<field name="arch" type="xml">
 				<form string="bpl_worker_registration">
-					<group>
+					
 						<group>
-							<field name="bpl_company_id" />
-							<field name="bpl_estate_id" />
-							<field name="bpl_division_id" />
-							<field name="register_no" />
-							<field name="employer_no" />
-							<field name="epf_no" placeholder="EPF No" />
-							<field name="emp_no" />
-							<field name="epf" />
-							<field name="nic_no" />
-						</group>
-						<group>
+							<group>
+								<field name="bpl_company_id" />
+								<field name="bpl_estate_id" on_change="on_change_estate(bpl_estate_id)" />
+								<field name="bpl_division_id" />
+								<field name="register_no" />
+								<field name="employer_no" />
+								<field name="epf_no" />
+								<field name="emp_no" />
+								<field name="nic_no" />
+							</group>
+							<group>
 
-							<field name="name" />
-							<field name="date_of_birth" />
-							<field name="gender" />
-							<field name="is_married" />
-							<field name="spouse_name" attrs="{'invisible':[('is_married','=',False)]}" />
-						</group>
-						<group>
-							<field name="father_name" />
-							<field name="mother_name" />
-							<field name="date_appointed" />
-							<field name="status" />
-							<field name="religion_id" />
-							<field name="festival_id" invisible="1" />
-							<field name="date_of_approval" invisible="1" />
-						</group>
-						<group>
-							<field name="default_work" />
-							<field name="union_id" />
+								<field name="name" />
+								<field name="date_of_birth" />
+								<field name="gender" />
+								<field name="is_married" />
+								<field name="spouse_name" attrs="{'invisible':[('is_married','=',False)]}" />
+							</group>
+							<group>
+								<field name="father_name" />
+								<field name="mother_name" />
+								<field name="date_appointed" />
+								<field name="status" />
+								<field name="religion_id" />
+								<field name="festival_id" invisible="1" />
+								<field name="date_of_approval" invisible="1" />
+							</group>
+							<group>
+								<field name="default_work" />
+								<field name="union_id" />
 
-							<field name="address_line_1" />
-							<field name="address_line_2" />
-							<field name="address_line_3" />
+								<field name="address_line_1" />
+								<field name="address_line_2" />
+								<field name="address_line_3" />
 
-							<field name="estate_resident" />
-							<field name="occupation_code" attrs="{'invisible':[('estate_resident','=',False)]}" />
-							<field name="is_active" />
-							<field name="current_status" attrs="{'invisible':[('is_active','=',False)]}" />
+								<field name="estate_resident" />
+								<field name="occupation_code"
+									attrs="{'invisible':[('estate_resident','=',False)]}" />
+								<field name="epf" />
+								<field name="is_active" />
+								<field name="current_status" attrs="{'invisible':[('is_active','=',False)]}" />
+							</group>
 						</group>
-					</group>
+					
 				</form>
 			</field>
 		</record>
@@ -360,6 +389,11 @@
 			<field name="res_model">bpl.company.estate.division</field>
 		</record>
 
+		<record model="ir.actions.act_window" id="bpl_designation_action">
+			<field name="name">bpl_designation</field>
+			<field name="res_model">bpl.designation</field>
+		</record>
+
 		<!-- #################################################### Work Update #################################################### -->
 		<record model="ir.ui.view" id="bpl_work_update_form">
 			<field name="name">bpl.work.update.form</field>
@@ -482,7 +516,10 @@
 			id="bpl_estate_n_registration" action="bpl_estate_n_registration_action" />
 		<menuitem name="Division New" parent="menu_bpl_ref"
 			id="bpl_division_n_registration" action="bpl_division_n_registration_action" />
+		<menuitem name="Designations" parent="menu_bpl_ref" id="bpl_designation"
+			action="bpl_designation_action" />
 
-	
+
+
 	</data>
 </openerp>
