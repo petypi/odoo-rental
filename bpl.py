@@ -10,6 +10,8 @@ class bpl_officer_registration(osv.osv):
         'bpl_division_id':fields.many2one('bpl.division.n.registration', 'Division', help='Division', domain="[('estate_id','=',bpl_estate_id)]"),
         'name': fields.char('Name', size=128, required=True, select=True),
         'nic_no': fields.char('NIC No', size=128,),
+        'emp_no': fields.char('EMP No', size=128,),
+        'epf_no': fields.char('EPF No', size=128,),
         'street': fields.char('Street', size=128),
         'street2': fields.char('Street2', size=128),
         'city': fields.char('City', size=128),
@@ -19,7 +21,13 @@ class bpl_officer_registration(osv.osv):
         'mobile': fields.char('Mobile', size=64),
         'fax': fields.char('Fax', size=64),
         'email': fields.char('Email', size=240),
-        'job_position': fields.char('Job Position', size=240),
+        'job_position': fields.many2one('bpl.designation', 'Designation'),
+        'work_for': fields.selection([('estate', 'Estate'), ('head_office', 'Head Office')], 'Work For'),
+        'date_of_birth': fields.date('Date of Birth'),
+        'date_of_appointed': fields.date('Date of Appointed'),
+        'is_active': fields.boolean('Inactive', help="Is active or not"),
+        'current_status': fields.selection([('suspend', 'Suspend'), ('terminate', 'Terminate'), ('dismiss', 'Dismiss')], 'Current Status'),
+
         }
     _defaults = {
 #     'bpl_company_id': get_default_company
@@ -39,50 +47,43 @@ class bpl_worker_registration(osv.osv):
             }
         }        
         
-    def on_change_company(self, cr, uid, ids, company_id, context=None):
-        if not company_id:
-            return {'value': {
-                'bpl_estate_id': False
-            }}
-        company = self.pool.get('bpl.company.n.registration').browse(cr, uid, company_id, context=context)
-        estatelist = company.estates
-        if estatelist:
-            return { 
-                    'value': {
-                              'bpl_estate_id': estatelist[0].id
-                              }
-                    }
-            
-        else:
-            return {
-                    'value': {
-                              'bpl_estate_id': False
-                              }
-                    }
     
     def on_change_estate(self, cr, uid, ids, estate_id, context=None):
-        if not estate_id:
-            return {'value': {
-                'bpl_estate_id': False
-            }}
-        estate = self.pool.get('bpl.estate.n.registration').browse(cr, uid, estate_id, context=context)
-        divisionslist = estate.divisions
-        if divisionslist:
-            return { 
-                    'value': {
-                              'bpl_division_id': divisionslist[0].id
-                              }
-                    }
-        else:
-            return {
-                    'value': {
-                              'bpl_division_id': False
-                              }
-                    }
+        if estate_id:
+            estate_object = self.pool.get('bpl.estate.n.registration')
+            estate_browse = estate_object.browse(cr, uid, estate_id, context=context)
+            result_estate_id = estate_browse.id
+            search_condition = [
+                              ('department_id', '=', result_estate_id)
+                              ]
+            # currency_id = self.pool.get('res.country').browse(cr, uid, country_id, context=context).currency_id.id
+            employer_no_object = self.pool.get('bpl.employer.epf')
+            employers_id = employer_no_object.search(cr, uid, search_condition, context=context)
+            employer_no = employer_no_object.browse(cr, uid, employers_id, context=context)
+#            employer_browse = employer_no_object.browse(cr, uid, estate_id, context=context)
+            return {'value': {'employer_no': employer_no[0].epf_no }}
+    
+
+    def _max_reg_no(self, cr, uid, context=None):
+        cr.execute("""
+        select register_no as reg_no
+        from bpl_worker
+        where id in (select max(id) from bpl_worker)
+        """)
+        res = cr.fetchone()[0]
+        print (res)
+        emp_no = str(res)
+        emp_int = emp_no[1:6]
+        emp_no_int = int(emp_int)
+        result = 'W' + (str(emp_no_int + 1).zfill(4))
+        return result
+
+
+
         
     def create(self, cr, uid, values, context=None):
         values['register_no'] = self.pool.get('ir.sequence').get(cr, uid, 'bpl.worker')
-        values['employer_no'] = self.pool.get('ir.sequence').get(cr, uid, 'bpl.employer')
+#        values['employer_no'] = self.pool.get('ir.sequence').get(cr, uid, 'bpl.employer')
         return super(bpl_worker_registration, self).create(cr, uid, values, context=context)
 
     def _get_result(self, cr, uid, ids, prop, unknow_none, context=None):
@@ -108,7 +109,7 @@ class bpl_worker_registration(osv.osv):
         'epf_no': fields.char('EPF No', size=32, help='EPF No'),
 #        'epf_no': fields.function(_get_result, string='EPF No', type='char'),
         'epf': fields.boolean('EPF', help="EPF eligible or not"),
-        'emp_no': fields.char('Emp No', type='char', readonly=True),
+        'emp_no': fields.char('Emp No', type='char'),
         'nic_no': fields.char('NIC No', size=32, help='NIC No'),
         'name': fields.char('Name with Initials', size=256, help='Name it to easily find a record'),
         'name_in_full': fields.char('Name in Full', size=256, help='Name it to easily find a record'),
@@ -134,12 +135,12 @@ class bpl_worker_registration(osv.osv):
         
         'occupation_code': fields.char('Occupation Code', size=32, help='Occupation Code'),
         'is_active': fields.boolean('Inactive', help="Is active or not"),
-        'current_status': fields.selection([('active', 'Active'), ('inactive', 'Inactive'), ('suspend', 'Suspend'), ('terminate', 'Terminate'), ('dismiss', 'Dismiss')], 'Current Status'),
+        'current_status': fields.selection([('suspend', 'Suspend'), ('terminate', 'Terminate'), ('dismiss', 'Dismiss')], 'Current Status'),
         }
     _defaults = {
-     'register_no': lambda obj, cr, uid, context: obj.pool.get('ir.sequence').get(cr, uid, 'bpl.worker'),
-     'employer_no': lambda obj, cr, uid, context: obj.pool.get('ir.sequence').get(cr, uid, 'bpl.employer'),
-#     'employer_no': _get_result,
+#     'register_no': lambda obj, cr, uid, context: '/'
+#     'employer_no': lambda obj, cr, uid, context: obj.pool.get('ir.sequence').get(cr, uid, 'bpl.employer'),
+     'register_no': _max_reg_no,
      }
 
 
@@ -153,6 +154,16 @@ class relegion_registration(osv.osv):
     }
 
 relegion_registration()
+
+
+class bpl_designation(osv.osv):
+    _name = "bpl.designation"
+    _description = "Designations"
+    _columns = {
+        'name': fields.char('Designation', size=256, required=True, help='Designation Name'),
+    }
+
+bpl_designation()
 
 class festival_registration(osv.osv):
     _name = "bpl.festival"
@@ -238,7 +249,7 @@ class bpl_work_offer(osv.osv):
     _columns = {
 #        'user_id': fields.many2one('bpl.officer', 'User Name'),
         'user_id': fields.many2one('bpl.officer', 'User Name'),
-        'date_of_offer': fields.date('Offer date'),
+        'date_of_offer': fields.date('Offer Date'),
         'bpl_company_id':fields.many2one('bpl.company.n.registration', 'Company', help='Company'),
         'bpl_estate_id':fields.many2one('bpl.estate.n.registration', 'Estate', help='Estate'),
         'bpl_division_id':fields.many2one('bpl.division.n.registration', 'Division', help='Division', domain="[('estate_id','=',bpl_estate_id)]"),
