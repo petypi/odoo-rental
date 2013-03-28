@@ -1,6 +1,6 @@
 <?xml version="1.0"?>
 <openerp>
-  <data>
+	<data>
 		<record model="ir.actions.act_window" id="bpl_officer_registration_action">
 			<field name="name">bpl.officer.action</field>
 			<field name="res_model">bpl.officer</field>
@@ -311,7 +311,7 @@
 								<field name='selected_sundry_workers_line_ids' nolabel='1'>
 									<tree string='List' editable='bottom'>
 										<field name='sundry_line_worker_id' invisible="1" />
-										<field name='worker_id' />	
+										<field name='worker_id' />
 										<field name='is_selected' />
 									</tree>
 								</field>
@@ -355,6 +355,10 @@
 			<field name="res_model">bpl.division.n.registration</field>
 		</record>
 
+		<record model="ir.actions.act_window" id="bpl_company_estate_division_action">
+			<field name="name">bpl_company_estate_division</field>
+			<field name="res_model">bpl.company.estate.division</field>
+		</record>
 
 		<!-- #################################################### Work Update #################################################### -->
 		<record model="ir.ui.view" id="bpl_work_update_form">
@@ -478,5 +482,7 @@
 			id="bpl_estate_n_registration" action="bpl_estate_n_registration_action" />
 		<menuitem name="Division New" parent="menu_bpl_ref"
 			id="bpl_division_n_registration" action="bpl_division_n_registration_action" />
+
+	
 	</data>
 </openerp>
