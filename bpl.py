@@ -95,8 +95,7 @@ class bpl_worker_registration(osv.osv):
         user = self.pool.get('res.users').browse(cr, uid, uid, context=context)
         if user.company_id:
             return user.company_id.id
-        return self.pool.get('res.company').search(cr, uid, [('parent_id', '=', False)])[0]
-
+        return self.pool.get('bpl.company.n.registration').search(cr, uid, [])[0]
     
     _name = "bpl.worker"
     _description = "Worker registration details"
@@ -208,15 +207,19 @@ class bpl_work_offer(osv.osv):
         if division_id:
             division_self = self.pool.get('bpl.division.n.registration')
             division_browse = division_self.browse(cr, uid, division_id, context=context)
-            """    self.pool.get('bpl.division.n.registration') means get that object      """
-            """    division_self.browse means using division id search it for get record      """
-            result_id=division_browse.id
-            worker_object = self.pool.get('bpl.woker')            
+            result_id = division_browse.id
+            worker_object = self.pool.get('bpl.worker')            
             search_condition = [
                               ('bpl_division_id', '=', result_id)
                               ]
-            worker_list=worker_object.search(cr, uid, search_condition, context=None)
+            worker_list = worker_object.search(cr, uid, search_condition, context=context)
             return worker_list
+
+    def on_change_country(self, cr, uid, ids, country_id, context=None):
+        currency_id = self._get_euro(cr, uid, context=context)
+        if country_id:
+            currency_id = self.pool.get('res.country').browse(cr, uid, country_id, context=context).currency_id.id
+        return {'value': {'currency_id': currency_id}}
     
     def _get_selection(self, cursor, user_id, context=None):
         return (
@@ -294,12 +297,25 @@ class selected_sundry_workers_line_ids(osv.osv):
 selected_sundry_workers_line_ids()
 
 class company_estate_division(osv.osv):
+    
+    def _get_address_data(self, cr, uid, ids, field_names, arg, context=None):
+        return self.pool.get('bpl.company.n.registration').search(cr, uid, [])[0]
+
+    def _set_address_data(self, cr, uid, company_id, name, value, arg, context=None):
+        return True    
+    
     _name = 'bpl.company.estate.division'
     _description = 'bpl company estate division mapping'
     _columns = {
         'bpl_company_id':fields.many2one('bpl.company.n.registration', 'Company', help='Company'),
-        'bpl_estate_id':fields.many2one('bpl.estate.n.registration', 'Estate', help='Estate', domain="[('company_id','=',bpl_company_id)]"),
-        'bpl_division_id':fields.many2one('bpl.division.n.registration', 'Division', help='Division', domain="[('estate_id','=',bpl_estate_id)]"),
+        'bpl_estate_id':fields.many2one('bpl.estate.n.registration', 'Estate', help='Estate'),
+        'bpl_division_id':fields.many2one('bpl.division.n.registration', 'Division', help='Division'),
+
+        'company_id': fields.function(_get_address_data, fnct_inv=_set_address_data, type='many2one', relation='bpl.company.n.registration', string="Country New",
+        multi='address'),
+        
+        'state_id': fields.function(_get_address_data, fnct_inv=_set_address_data, type='many2one', domain="[('company_id', '=', bpl_company_id)]",
+        relation='bpl.estate.n.registration', string="Estate New"),
                 }
     
 company_estate_division()
