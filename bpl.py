@@ -8,7 +8,7 @@ class bpl_officer_registration(osv.osv):
         'bpl_company_id':fields.many2one('bpl.company.n.registration', 'Company', help='Company'),
         'bpl_estate_id':fields.many2one('bpl.estate.n.registration', 'Estate', help='Estate', domain="[('company_id','=',bpl_company_id)]"),
         'bpl_division_id':fields.many2one('bpl.division.n.registration', 'Division', help='Division', domain="[('estate_id','=',bpl_estate_id)]"),
-        'name': fields.char('Name', size=128, required=True, select=True),
+        'name': fields.char('Name', size=128, required=True),
         'nic_no': fields.char('NIC No', size=128,),
         'emp_no': fields.char('EMP No', size=128,),
         'epf_no': fields.char('EPF No', size=128,),
@@ -70,13 +70,15 @@ class bpl_worker_registration(osv.osv):
         from bpl_worker
         where id in (select max(id) from bpl_worker)
         """)
-        res = cr.fetchone()[0]
-        print (res)
-        emp_no = str(res)
-        emp_int = emp_no[1:6]
-        emp_no_int = int(emp_int)
-        result = 'W' + (str(emp_no_int + 1).zfill(4))
-        return result
+        if cr:
+            res = cr.fetchone()[0]
+            emp_no = str(res)
+            emp_int = emp_no[1:6]
+            emp_no_int = int(emp_int)
+            result = 'W' + (str(emp_no_int + 1).zfill(4))
+            return result
+        else:
+            return 'W0001'
 
     def create(self, cr, uid, values, context=None):
         values['register_no'] = self.pool.get('ir.sequence').get(cr, uid, 'bpl.worker')
@@ -138,6 +140,7 @@ class bpl_worker_registration(osv.osv):
 #     'register_no': lambda obj, cr, uid, context: '/'
 #     'employer_no': lambda obj, cr, uid, context: obj.pool.get('ir.sequence').get(cr, uid, 'bpl.employer'),
      'register_no': _max_reg_no,
+     'civil_status':'single',
      }
 
 
@@ -275,7 +278,7 @@ class bpl_work_offer(osv.osv):
 #        'report_for': fields.selection([('head_office', 'Head Office'), ('estate', 'Estate')], 'Report for'),
         'report_for' : fields.selection(_get_selection, 'Report for'),
         'payment_type': fields.selection([('normal_work', 'Normal Work'), ('cash_work', 'Cash Work')], 'Payment Type'),
-        'select_by': fields.selection([('by_name', 'By Names'), ('by_count', 'By Count')], 'Select  By'),
+        'select_by': fields.selection([('by_name', 'Names'), ('by_count', 'Count')], 'Offer  By'),
         'no_of_workers': fields.integer('No of Workers'),
         'work_type': fields.selection([('tea', 'Tea'), ('rubber', 'Rubber'), ('sundry', 'Sundry')], 'Work Type'),
         'total_workers': fields.integer('Total Workers'),
@@ -298,6 +301,8 @@ class selected_tea_workers_line_ids(osv.osv):
     _description = 'BPL Selected Tea Workers line'
     _columns = {
         'tea_line_worker_id':fields.many2one('bpl.work.offer', 'Tea Worker Line', ondelete='cascade', help='Worker Line'),
+        #'worker_emp_no':fields.many2one('bpl.worker', 'Emp No', ondelete='cascade', help='Tea Worker Emp No'),
+        'worker_emp_no': fields.char('EMP No', size=32, help='EPF No'),
         'worker_id':fields.many2one('bpl.worker', 'Tea Worker', ondelete='cascade', help='Tea Worker'),
         'is_selected': fields.boolean('Select', select=True, help="Selected or not"),
         }
@@ -312,6 +317,8 @@ class selected_rubber_workers_line_ids(osv.osv):
     _description = 'BPL Selected Rubber Workers line'
     _columns = {
         'rubber_line_worker_id':fields.many2one('bpl.work.offer', 'Rubber Worker', ondelete='cascade', help='Worker'),
+        #'worker_emp_no':fields.many2one('bpl.worker', 'Emp No', ondelete='cascade', help='Rubber Worker Emp No'),
+        'worker_emp_no': fields.char('EMP No', size=32, help='EPF No'),
         'worker_id':fields.many2one('bpl.worker', 'Rubber Worker', ondelete='cascade', help='Rubber Worker'),
         'is_selected': fields.boolean('Select', select=True, help="Selected or not"),
         }
@@ -326,6 +333,8 @@ class selected_sundry_workers_line_ids(osv.osv):
     _description = 'BPL Selected Sundry Workers line'
     _columns = {
         'sundry_line_worker_id':fields.many2one('bpl.work.offer', 'Sundry Worker', ondelete='cascade', help='Sundry Worker'),
+        #'worker_emp_no':fields.many2one('bpl.worker', 'Emp No', ondelete='cascade', help='Sundry Worker Emp No'),
+        'worker_emp_no': fields.char('EMP No', size=32, help='EPF No'),
         'worker_id':fields.many2one('bpl.worker', 'Sundry Worker', ondelete='cascade', help='Sundry Worker'),
         'is_selected': fields.boolean('Select', select=True, help="Selected or not"),
         }
@@ -465,3 +474,144 @@ class selected_sundry_workers_update_line_ids(osv.osv):
         }
 
 selected_sundry_workers_update_line_ids()
+
+
+#--------------------------------------------------------DEDUCTION MASTER DATA-------------------------------------------------------
+class deduction_master_data(osv.osv):
+    _name = 'bpl.deduction.master.data'
+    _description = 'BPL Deduction Master Data'
+    _columns = {
+                'based_on': fields.selection([('company', 'Company'), ('estate', 'Estate'), ('division', 'Division')], 'Based On'),
+                'bpl_company_id':fields.many2one('bpl.company.n.registration', 'Company', help='Company'),
+                'bpl_estate_id':fields.many2one('bpl.estate.n.registration', 'Estate', help='Estate', domain="[('company_id','=',bpl_company_id)]"),
+                'bpl_division_id':fields.many2one('bpl.division.n.registration', 'Division', help='Division', domain="[('estate_id','=',bpl_estate_id)]"),
+                # 'deduction_type': fields.selection([('fixed', 'Fixed'), ('variable', 'Variable'), ('special', 'Special')], 'Deduction Type'),
+                'fixed_deduction_ids': fields.one2many('bpl.fixed.deductions', 'deduction_id', 'Fixed Deductions', ondelete="cascade"),
+                'variable_deduction_ids': fields.one2many('bpl.variable.deductions', 'deduction_id', 'Variable Deductions', ondelete="cascade"),
+                'special_deduction_ids': fields.one2many('bpl.special.deductions', 'deduction_id', 'Special Deductions', ondelete="cascade"),
+                }
+    _defaults = {
+                 'based_on': 'company',
+                 }
+deduction_master_data()
+
+class fixed_deduction_ids(osv.osv):
+    _name = 'bpl.fixed.deductions'
+    _description = 'Fixed Deductions'
+    _columns = {
+                'deduction_id':fields.many2one('bpl.deduction.master.data', 'Fixed Deductions', ondelete='cascade'),
+                # 'deduction_name': fields.char('Deduction Name', type='char'),
+                'deduction_name':fields.many2one('bpl.deduction.registration', 'Deduction'),
+                'deduction_type': fields.selection([('rate', 'Rate'), ('amount', 'Amount')], 'Deduction Type'),
+                'rate':fields.float('Rate'),
+                'amount':fields.float('Amount'),
+                'active': fields.boolean('Active', help="Active"),
+        }
+
+fixed_deduction_ids()
+
+class variable_deduction_ids(osv.osv):
+    _name = 'bpl.variable.deductions'
+    _description = 'Variable Deductions'
+    _columns = {
+                'deduction_id':fields.many2one('bpl.deduction.master.data', 'Variable Deductions', ondelete='cascade'),
+                # 'deduction_name': fields.char('Deduction Name', type='char'),
+                'deduction_name':fields.many2one('bpl.deduction.registration', 'Deduction'),
+                'active': fields.boolean('Active', help="Active"),
+        }
+
+variable_deduction_ids()
+
+class special_deduction_ids(osv.osv):
+    _name = 'bpl.special.deductions'
+    _description = 'Special Deductions'
+    _columns = {
+                'deduction_id':fields.many2one('bpl.deduction.master.data', 'Special Deductions', ondelete='cascade'),
+                'bank_id': fields.many2one('bpl.bank.deductions', 'Bank Deductions', ondelete="cascade"),
+                'union_id': fields.many2one('bpl.union.deductions', 'Union Deductions', ondelete="cascade"),
+                'insurance_id': fields.many2one('bpl.insurance.deductions', 'Insurance Deductions', ondelete="cascade"),
+                'loan_id': fields.many2one('bpl.loan.deductions', 'Loan Deductions', ondelete="cascade"),
+        }
+
+special_deduction_ids()
+#------------------------------------------------------------------------------------
+class bank_deductions(osv.osv):
+    _name = "bpl.bank.deductions"
+    _description = "Bank Deductions"
+    _columns = {
+                'bank_id':fields.many2one('bpl.bank.registration', 'Bank'),
+                'branch_id': fields.many2one('bpl.branch.registration', 'Branch', ondelete='cascade', domain="[('bank_id','=',bank_id)]"),
+                'name': fields.char('Deduction', size=256),
+                'amount':fields.float('Amount'),
+                'active': fields.boolean('Active'),
+                }
+
+bank_deductions()
+
+class union_deductions(osv.osv):
+    _name = "bpl.union.deductions"
+    _description = "Union Deductions"
+    _columns = {
+                'union_id': fields.many2one('bpl.union', 'Union', help='Union'),
+                'name': fields.char('Deduction', size=256),
+                'amount':fields.float('Amount'),
+                'active': fields.boolean('Active'),
+                }
+
+union_deductions()
+
+class insurance_deductions(osv.osv):
+    _name = "bpl.insurance.deductions"
+    _description = "Insurance Deductions"
+    _columns = {
+                'name': fields.char('Insurance Name', size=256),
+                'policy_no': fields.char('Policy No', size=256),
+                'amount':fields.float('Amount'),
+                'active': fields.boolean('Active'),
+                }
+
+insurance_deductions()
+
+class loan_deductions(osv.osv):
+    _name = "bpl.loan.deductions"
+    _description = "Loan Deductions"
+    _columns = {
+                'name': fields.char('Loan Name', size=256, required=True),
+                'loan_amount':fields.float('Loan Amount'),
+                'installment_amount':fields.float('Installment Amount'),
+                'remain_amount':fields.float('Remain Amount'),
+                'active': fields.boolean('Active'),
+                }
+
+loan_deductions()
+#------------------------------------------------------------------------------------
+
+class deduction_registration(osv.osv):
+    _name = "bpl.deduction.registration"
+    _description = "Deduction Registration"
+    _columns = {
+        'name': fields.char('Deduction Name', size=256, required=True),
+    }
+
+deduction_registration()
+
+
+class bank_registration(osv.osv):
+    _name = "bpl.bank.registration"
+    _description = "Bank"
+    _columns = {
+                'name': fields.char('Bank Name', size=128, required=True),
+                'branches': fields.one2many('bpl.branch.registration', 'bank_id', 'Branch')
+    }
+
+bank_registration()
+
+class branch_registration(osv.osv):
+    _name = "bpl.branch.registration"
+    _description = "Branch"
+    _columns = {
+        'name': fields.char('Branch Name', size=128, required=True),
+        'bank_id': fields.many2one('bpl.bank.registration', 'Bank Name'),
+    }
+
+branch_registration()
