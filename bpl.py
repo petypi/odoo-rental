@@ -65,6 +65,7 @@ class bpl_worker_registration(osv.osv):
 
 
     def _max_reg_no(self, cr, uid, context=None):
+        res = {}
         cr.execute("""
         select register_no as reg_no
         from bpl_worker
@@ -301,7 +302,7 @@ class selected_tea_workers_line_ids(osv.osv):
     _description = 'BPL Selected Tea Workers line'
     _columns = {
         'tea_line_worker_id':fields.many2one('bpl.work.offer', 'Tea Worker Line', ondelete='cascade', help='Worker Line'),
-        #'worker_emp_no':fields.many2one('bpl.worker', 'Emp No', ondelete='cascade', help='Tea Worker Emp No'),
+        # 'worker_emp_no':fields.many2one('bpl.worker', 'Emp No', ondelete='cascade', help='Tea Worker Emp No'),
         'worker_emp_no': fields.char('EMP No', size=32, help='EPF No'),
         'worker_id':fields.many2one('bpl.worker', 'Tea Worker', ondelete='cascade', help='Tea Worker'),
         'is_selected': fields.boolean('Select', select=True, help="Selected or not"),
@@ -317,7 +318,7 @@ class selected_rubber_workers_line_ids(osv.osv):
     _description = 'BPL Selected Rubber Workers line'
     _columns = {
         'rubber_line_worker_id':fields.many2one('bpl.work.offer', 'Rubber Worker', ondelete='cascade', help='Worker'),
-        #'worker_emp_no':fields.many2one('bpl.worker', 'Emp No', ondelete='cascade', help='Rubber Worker Emp No'),
+        # 'worker_emp_no':fields.many2one('bpl.worker', 'Emp No', ondelete='cascade', help='Rubber Worker Emp No'),
         'worker_emp_no': fields.char('EMP No', size=32, help='EPF No'),
         'worker_id':fields.many2one('bpl.worker', 'Rubber Worker', ondelete='cascade', help='Rubber Worker'),
         'is_selected': fields.boolean('Select', select=True, help="Selected or not"),
@@ -333,7 +334,7 @@ class selected_sundry_workers_line_ids(osv.osv):
     _description = 'BPL Selected Sundry Workers line'
     _columns = {
         'sundry_line_worker_id':fields.many2one('bpl.work.offer', 'Sundry Worker', ondelete='cascade', help='Sundry Worker'),
-        #'worker_emp_no':fields.many2one('bpl.worker', 'Emp No', ondelete='cascade', help='Sundry Worker Emp No'),
+        # 'worker_emp_no':fields.many2one('bpl.worker', 'Emp No', ondelete='cascade', help='Sundry Worker Emp No'),
         'worker_emp_no': fields.char('EMP No', size=32, help='EPF No'),
         'worker_id':fields.many2one('bpl.worker', 'Sundry Worker', ondelete='cascade', help='Sundry Worker'),
         'is_selected': fields.boolean('Select', select=True, help="Selected or not"),
@@ -527,14 +528,67 @@ class special_deduction_ids(osv.osv):
     _description = 'Special Deductions'
     _columns = {
                 'deduction_id':fields.many2one('bpl.deduction.master.data', 'Special Deductions', ondelete='cascade'),
-                'bank_id': fields.many2one('bpl.bank.deductions', 'Bank Deductions', ondelete="cascade"),
-                'union_id': fields.many2one('bpl.union.deductions', 'Union Deductions', ondelete="cascade"),
-                'insurance_id': fields.many2one('bpl.insurance.deductions', 'Insurance Deductions', ondelete="cascade"),
-                'loan_id': fields.many2one('bpl.loan.deductions', 'Loan Deductions', ondelete="cascade"),
+                'special_deduction_type': fields.selection([('bank', 'Bank'), ('union', 'Union'), ('insurance', 'Insurance'), ('loan', 'Loan')], 'Deduct for'),
+                'bank_id': fields.many2one('bpl.bank.deductions', 'Bank Deductions'),
+                'union_id': fields.many2one('bpl.union.deductions', 'Union Deductions'),
+                'insurance_id': fields.many2one('bpl.insurance.deductions', 'Insurance Deductions'),
+                'loan_id': fields.many2one('bpl.loan.deductions', 'Loan Deductions'),
         }
 
 special_deduction_ids()
-#------------------------------------------------------------------------------------
+#--------------------------------------------------------DEDUCTION ______ DATA-------------------------------------------------------
+class deduction_estate_data(osv.osv):
+    _name = 'bpl.deduction.estate.data'
+    _description = 'BPL Deduction Estate Data'
+    _columns = {
+                'bpl_company_id':fields.many2one('bpl.company.n.registration', 'Company', help='Company'),
+                'bpl_estate_id':fields.many2one('bpl.estate.n.registration', 'Estate', help='Estate', domain="[('company_id','=',bpl_company_id)]"),
+                'fixed_deduction_ids': fields.one2many('bpl.fixed.deductions', 'deduction_id', 'Fixed Deductions', ondelete="cascade"),
+                'variable_deduction_ids': fields.one2many('bpl.variable.deductions', 'deduction_id', 'Variable Deductions', ondelete="cascade"),
+                'special_deduction_ids': fields.one2many('bpl.special.deductions', 'deduction_id', 'Special Deductions', ondelete="cascade"),
+                }
+    _defaults = {}
+deduction_estate_data()
+
+class fixed_estate_deduction_ids(osv.osv):
+    _name = 'bpl.estate.fixed.deductions'
+    _description = 'Estate Fixed Deductions'
+    _columns = {
+                'deduction_id':fields.many2one('bpl.deduction.estate.data', 'Fixed Estate Deductions'),
+                'deduction_name':fields.many2one('bpl.deduction.registration', 'Deduction'),
+                'deduction_type': fields.selection([('rate', 'Rate'), ('amount', 'Amount')], 'Deduction Type'),
+                'rate':fields.float('Rate'),
+                'amount':fields.float('Amount'),
+                'active': fields.boolean('Active', help="Active"),
+        }
+
+fixed_estate_deduction_ids()
+
+class variable_estate_deduction_ids(osv.osv):
+    _name = 'bpl.variable.estate.deductions'
+    _description = 'Estate Variable Deductions'
+    _columns = {
+                'deduction_id':fields.many2one('bpl.deduction.estate.data', 'Variable Deductions'),
+                'deduction_name':fields.many2one('bpl.deduction.registration', 'Deduction'),
+                'active': fields.boolean('Active', help="Active"),
+        }
+
+variable_estate_deduction_ids()
+
+class special_estate_deduction_ids(osv.osv):
+    _name = 'bpl.special.estate.deductions'
+    _description = 'Estate Special Deductions'
+    _columns = {
+                'deduction_id':fields.many2one('bpl.deduction.master.data', 'Special Deductions', ondelete='cascade'),
+                'special_deduction_type': fields.selection([('bank', 'Bank'), ('union', 'Union'), ('insurance', 'Insurance'), ('loan', 'Loan')], 'Deduct for'),
+                'bank_id': fields.many2one('bpl.bank.deductions', 'Bank Deductions'),
+                'union_id': fields.many2one('bpl.union.deductions', 'Union Deductions'),
+                'insurance_id': fields.many2one('bpl.insurance.deductions', 'Insurance Deductions'),
+                'loan_id': fields.many2one('bpl.loan.deductions', 'Loan Deductions'),
+        }
+
+special_estate_deduction_ids()
+#--------------------------------------------------------DEDUCTION ESTATE DATA-------------------------------------------------------
 class bank_deductions(osv.osv):
     _name = "bpl.bank.deductions"
     _description = "Bank Deductions"
