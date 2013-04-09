@@ -576,10 +576,16 @@
 								<field name='special_deduction_ids' nolabel='1'>
 									<tree string='List' editable='bottom'>
 										<field name='deduction_id' invisible="1" />
-										<field name='bank_id' />
-										<field name='union_id' />
-										<field name='insurance_id' />
-										<field name='loan_id' />
+										<field name='special_deduction_type' />
+										<field name='bank_id'
+											attrs="{'invisible': [('special_deduction_type','in',('loan','union','insurance'))]}" />
+										<field name='union_id'
+											attrs="{'invisible': [('special_deduction_type','in',('bank','loan','insurance'))]}" />
+										<field name='insurance_id'
+											attrs="{'invisible': [('special_deduction_type','in',('loan','union','bank'))]}" />
+										<field name='loan_id'
+											attrs="{'invisible': [('special_deduction_type','in',('bank','union','insurance'))]}" />
+
 									</tree>
 								</field>
 								<br />
@@ -595,11 +601,105 @@
 			<field name="name">bpl.deduction.master.data.action</field>
 			<field name="res_model">bpl.deduction.master.data</field>
 			<field name="view_type">form</field>
-			<field name="view_mode">form</field>
+			<field name="view_mode">tree,form</field>
+		</record>
+
+
+		<record id="bpl_deduction_master_data_tree" model="ir.ui.view">
+			<field name="name">bpl.deduction.master.data.tree</field>
+			<field name="model">bpl.deduction.master.data</field>
+			<field name="arch" type="xml">
+				<tree string="bpl_deduction_master_data">
+					<field name="bpl_estate_id" />
+					<field name="fixed_deduction_ids" />
+					<field name="variable_deduction_ids" />
+					<field name="special_deduction_ids" />
+				</tree>
+			</field>
 		</record>
 
 		<!-- ############################################# END DEDUCTION MASTER 
 			DATA ##################################################### -->
+
+		<!-- #################################################### START ESTATE 
+			DEDUCTION #################################################### -->
+
+		<record model="ir.ui.view" id="bpl_deduction_estate_data">
+			<field name="name">bpl.deduction.estate.data.form</field>
+			<field name="model">bpl.deduction.estate.data</field>
+			<field name="arch" type="xml">
+				<form string='bpl_deduction_estate_data' version='7.0'>
+					<sheet>
+						<group>
+							<group>
+								<field name='bpl_company_id' />
+								<field name='bpl_estate_id' />
+							</group>
+						</group>
+						<div name="Deduction Estate Data"></div>
+						<separator string='Deduction Estate Data' />
+						<notebook>
+							<page string="Fixed Deductions">
+								<field name='fixed_deduction_ids' nolabel='1'>
+									<tree string='List' editable='bottom'>
+										<field name='deduction_id' invisible="1" />
+										<field name='deduction_name' />
+										<field name='deduction_type' />
+										<field name='rate'
+											attrs="{'invisible':[('deduction_type','=','amount')]}" />
+										<field name='amount'
+											attrs="{'invisible':[('deduction_type','=','rate')]}" />
+										<field name='active' />
+									</tree>
+								</field>
+								<br />
+								<br />
+							</page>
+							<page string="Variable Deductions">
+								<field name='variable_deduction_ids' nolabel='1'>
+									<tree string='List' editable='bottom'>
+										<field name='deduction_id' invisible="1" />
+										<field name='deduction_name' />
+										<field name='active' />
+									</tree>
+								</field>
+								<br />
+								<br />
+							</page>
+							<page string="Special Deductions">
+								<field name='special_deduction_ids' nolabel='1'>
+									<tree string='List' editable='bottom'>
+										<field name='deduction_id' invisible="1" />
+										<field name='special_deduction_type' />
+										<field name='bank_id'
+											attrs="{'invisible': [('special_deduction_type','in',('loan','union','insurance'))]}" />
+										<field name='union_id'
+											attrs="{'invisible': [('special_deduction_type','in',('bank','loan','insurance'))]}" />
+										<field name='insurance_id'
+											attrs="{'invisible': [('special_deduction_type','in',('loan','union','bank'))]}" />
+										<field name='loan_id'
+											attrs="{'invisible': [('special_deduction_type','in',('bank','union','insurance'))]}" />
+
+									</tree>
+								</field>
+								<br />
+								<br />
+							</page>
+						</notebook>
+					</sheet>
+				</form>
+			</field>
+		</record>
+
+		<record model="ir.actions.act_window" id="bpl_deduction_estate_data_action">
+			<field name="name">bpl.deduction.estate.data.action</field>
+			<field name="res_model">bpl.deduction.estate.data</field>
+			<field name="view_type">form</field>
+			<field name="view_mode">form</field>
+		</record>
+
+		<!-- ############################################# END ESTATE DEDUCTION 
+			##################################################### -->
 
 		<menuitem id="menu_bpl" name="Checkroll/Registration" />
 		<menuitem id="menu_bpl_ref" name="Reference" parent="menu_bpl" />
@@ -614,6 +714,8 @@
 			parent="menu_bpl" action="bpl_work_update_action" sequence="4" />
 		<menuitem id="menu_bpl_deduction_master_data" name="Deduction Master Data"
 			parent="menu_bpl" action="bpl_deduction_master_data_action" sequence="5" />
+		<menuitem id="menu_bpl_deduction_estate_data" name="Deduction Estate Data"
+			parent="menu_bpl" action="bpl_deduction_estate_data_action" sequence="5" />
 
 		<menuitem id="menu_bpl_religion_registration" name="Religion Registration"
 			parent="menu_bpl_ref" action="bpl_religion_registration_action" />
