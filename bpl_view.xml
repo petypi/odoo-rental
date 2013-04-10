@@ -93,7 +93,7 @@
 							<group>
 								<field name="bpl_company_id" />
 								<field name="bpl_estate_id" on_change="on_change_estate(bpl_estate_id)" />
-								<field name="bpl_division_id" />
+								<field name="bpl_division_id" on_change="on_change_division(bpl_division_id)" />
 								<field name="register_no" style="width: 30%%" />
 								<field name="employer_no" style="width: 30%%" />
 								<field name="epf_no" style="width: 30%%" />
@@ -550,12 +550,10 @@
 									<tree string='List' editable='bottom'>
 										<field name='deduction_id' invisible="1" />
 										<field name='deduction_name' />
-										<field name='deduction_type' />
-										<field name='rate'
-											attrs="{'invisible':[('deduction_type','=','amount')]}" />
-										<field name='amount'
-											attrs="{'invisible':[('deduction_type','=','rate')]}" />
-										<field name='active' />
+										<field name='deduction_type' invisible="1" />
+										<field name='rate' invisible="1" />
+										<field name='amount' invisible="1" />
+										<field name='active' invisible="1" />
 									</tree>
 								</field>
 								<br />
@@ -566,7 +564,7 @@
 									<tree string='List' editable='bottom'>
 										<field name='deduction_id' invisible="1" />
 										<field name='deduction_name' />
-										<field name='active' />
+										<field name='active' invisible="1" />
 									</tree>
 								</field>
 								<br />
@@ -618,11 +616,8 @@
 			</field>
 		</record>
 
-		<!-- ############################################# END DEDUCTION MASTER 
-			DATA ##################################################### -->
-
-		<!-- #################################################### START ESTATE 
-			DEDUCTION #################################################### -->
+		<!-- #################################################### END DEDUCTION 
+			MASTER DATA AND START ESTATE DEDUCTION #################################################### -->
 
 		<record model="ir.ui.view" id="bpl_deduction_estate_data">
 			<field name="name">bpl.deduction.estate.data.form</field>
