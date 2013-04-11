@@ -217,6 +217,7 @@
 					<field name="min_no" attrs="{'invisible':[('is_company','=',False)]}" />
 					<field name="max_no" attrs="{'invisible':[('is_company','=',False)]}" />
 					<field name="current_no" attrs="{'readonly':[('is_company','=',False)]}" />
+					<field name="name" invisible="1" />
 				</form>
 			</field>
 		</record>
@@ -226,13 +227,13 @@
 			<field name="model">bpl.company.define</field>
 			<field name="type">tree</field>
 			<field name="arch" type="xml">
-				<form string="bpl_company_define">
+				<tree string="bpl_company_define">
 					<field name="department_id" />
 					<field name="is_company" />
 					<field name="min_no" attrs="{'invisible':[('is_company','=',False)]}" />
 					<field name="max_no" attrs="{'invisible':[('is_company','=',False)]}" />
 					<field name="current_no" readonly="1" />
-				</form>
+				</tree>
 			</field>
 		</record>
 
@@ -433,6 +434,11 @@
 		<record model="ir.actions.act_window" id="bpl_branch_registration_action">
 			<field name="name">bpl.branch.registration</field>
 			<field name="res_model">bpl.branch.registration</field>
+		</record>
+		
+		<record model="ir.actions.act_window" id="bpl_bank_branch_registration_action">
+			<field name="name">bpl.bank.branch.registration</field>
+			<field name="res_model">bpl.bank.branch.registration</field>
 		</record>
 
 
@@ -698,6 +704,7 @@
 
 		<menuitem id="menu_bpl" name="Checkroll/Registration" />
 		<menuitem id="menu_bpl_ref" name="Reference" parent="menu_bpl" />
+		<menuitem id="menu_bpl_logic" name="Company Specific" parent="menu_bpl" />
 
 		<menuitem id="menu_bpl_worker_registration" name="Worker Registration"
 			parent="menu_bpl" action="bpl_worker_registration_action" sequence="1" />
@@ -722,9 +729,9 @@
 			parent="menu_bpl_ref" action="bpl_sundry_work_registration_action" />
 
 		<menuitem id="menu_bpl_company_define" name="Numbering Unit"
-			parent="menu_bpl_ref" action="bpl_company_define_action" />
+			parent="menu_bpl_logic" action="bpl_company_define_action" />
 		<menuitem id="menu_bpl_employer_empno" name="Employer No Define"
-			parent="menu_bpl_ref" action="bpl_employer_empno_action" />
+			parent="menu_bpl_logic" action="bpl_employer_empno_action" />
 
 		<menuitem name="Company New" parent="menu_bpl_ref"
 			id="bpl_company_n_registration" action="bpl_company_n_registration_action" />
@@ -737,19 +744,22 @@
 		<menuitem name="Deductions" parent="menu_bpl_ref"
 			id="bpl_deduction_registration" action="bpl_deduction_registration_action" />
 
-		<menuitem name="Bank Deduction" parent="menu_bpl_ref" id="bpl_bank_deductions"
+		<menuitem name="Bank Deduction" parent="menu_bpl_logic" id="bpl_bank_deductions"
 			action="bpl_bank_deductions_action" />
-		<menuitem name="Union Deduction" parent="menu_bpl_ref"
+		<menuitem name="Union Deduction" parent="menu_bpl_logic"
 			id="bpl_union_deductions" action="bpl_union_deductions_action" />
-		<menuitem name="Insurance Deduction" parent="menu_bpl_ref"
+		<menuitem name="Insurance Deduction" parent="menu_bpl_logic"
 			id="bpl_insurance_deductions" action="bpl_insurance_deductions_action" />
-		<menuitem name="Loan Deduction" parent="menu_bpl_ref" id="bpl_loan_deductions"
+		<menuitem name="Loan Deduction" parent="menu_bpl_logic" id="bpl_loan_deductions"
 			action="bpl_loan_deductions_action" />
 
 		<menuitem name="Bank Registration" parent="menu_bpl_ref"
 			id="bpl_bank_registration" action="bpl_bank_registration_action" />
 		<menuitem name="Branch Registration" parent="menu_bpl_ref"
 			id="bpl_branch_registration" action="bpl_branch_registration_action" />
+		<menuitem name="Bank/Branch Registration" parent="menu_bpl_ref"
+			id="bpl_bank_branch_registration" action="bpl_bank_branch_registration_action" />
+		
 
 	</data>
 </openerp>
