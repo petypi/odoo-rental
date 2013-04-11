@@ -93,11 +93,14 @@ class bpl_worker_registration(osv.osv):
 
     def create(self, cr, uid, values, context=None):
         values['register_no'] = self.pool.get('ir.sequence').get(cr, uid, 'bpl.worker')
-        emp_no = values['emp_no']
+        emp_no_i = values['emp_no']
+        emp_no = int(emp_no_i)
+        emp_no += 1
         division_id = values['bpl_division_id']
         no_define_object = self.pool.get('bpl.company.define')
         no_define_object_browse = no_define_object.browse(cr, uid, division_id, context=context)
-        no_define_object_browse.write({'current_no': emp_no})
+        if no_define_object_browse:
+            no_define_object_browse.write({'current_no': emp_no})
         return super(bpl_worker_registration, self).create(cr, uid, values, context=context)
 
     def _get_result(self, cr, uid, ids, prop, unknow_none, context=None):
@@ -205,6 +208,7 @@ class company_define(osv.osv):
     _columns = {
         'department_id':fields.many2one('bpl.division.n.registration', 'Division', required=True, help='Division'),
         'is_company': fields.boolean('Numbering Unit', help="Is numbering unit or not"),
+        'name': fields.char('Name'),
         'min_no': fields.integer('Min'),
         'max_no': fields.integer('Max'),
         'current_no': fields.integer('Current No'),
@@ -237,19 +241,19 @@ class bpl_work_offer(osv.osv):
         
         if division_id:
             
-            tea_worker_ids = self.pool.get('bpl.worker').search(cr, uid, [('bpl_division_id', '=', division_id)])
+            tea_worker_ids = self.pool.get('bpl.worker').search(cr, uid, [('bpl_division_id', '=', division_id), ('default_work', '=', 'tea')])
             for record in self.pool.get('bpl.worker').browse(cr, uid, tea_worker_ids):
                 tea_list_data.append({'worker_id': record.id, 'worker_emp_no': record.emp_no})
             tea_v['selected_tea_workers_line_ids'] = tea_list_data
             
         if division_id:    
-            rubber_worker_ids = self.pool.get('bpl.worker').search(cr, uid, [('bpl_division_id', '=', division_id)])
+            rubber_worker_ids = self.pool.get('bpl.worker').search(cr, uid, [('bpl_division_id', '=', division_id), ('default_work', '=', 'rubber')])
             for record in self.pool.get('bpl.worker').browse(cr, uid, rubber_worker_ids):
                 rubber_list_data.append({'worker_id': record.id, 'worker_emp_no': record.emp_no})
             rubber_v['selected_rubber_workers_line_ids'] = rubber_list_data
             
         if division_id:
-            sundry_worker_ids = self.pool.get('bpl.worker').search(cr, uid, [('bpl_division_id', '=', division_id)])
+            sundry_worker_ids = self.pool.get('bpl.worker').search(cr, uid, [('bpl_division_id', '=', division_id), ('default_work', '=', 'sundry')])
             for record in self.pool.get('bpl.worker').browse(cr, uid, sundry_worker_ids):
                 sundry_list_data.append({'worker_id': record.id, 'worker_emp_no': record.emp_no})
             sundry_v['selected_sundry_workers_line_ids'] = sundry_list_data
@@ -648,7 +652,7 @@ class bank_registration(osv.osv):
     _description = "Bank"
     _columns = {
                 'name': fields.char('Bank Name', size=128, required=True),
-                'branches': fields.one2many('bpl.branch.registration', 'bank_id', 'Branch')
+                'branch_id': fields.one2many('bpl.branch.registration', 'bank_id', 'Branch')
     }
 
 bank_registration()
@@ -662,3 +666,14 @@ class branch_registration(osv.osv):
     }
 
 branch_registration()
+
+class bank_branch_registration(osv.osv):
+    _name = "bpl.bank.branch.registration"
+    _description = "Bank/Branch"
+    _columns = {
+        'bank_id': fields.related('branch_id', 'bank_id', type='many2one', relation='bpl.bank.registration', string='Bank'),
+        'branch_id': fields.many2one('bpl.branch.registration', 'Branch'),
+        'name': fields.char('Code', size=128, required=True),
+    }
+
+bank_branch_registration()
