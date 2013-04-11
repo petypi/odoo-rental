@@ -97,7 +97,7 @@ class bpl_worker_registration(osv.osv):
         division_id = values['bpl_division_id']
         no_define_object = self.pool.get('bpl.company.define')
         no_define_object_browse = no_define_object.browse(cr, uid, division_id, context=context)
-        no_define_object_browse.write(cr, uid, {'current_no': emp_no})
+        no_define_object_browse.write({'current_no': emp_no})
         return super(bpl_worker_registration, self).create(cr, uid, values, context=context)
 
     def _get_result(self, cr, uid, ids, prop, unknow_none, context=None):
