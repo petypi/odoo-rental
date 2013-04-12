@@ -10,7 +10,8 @@
     'data': [
              'bpl_worker_registration_sequence.xml',
              'bpl_view.xml',
-             'security/bpl_security.xml'],
+             'security/bpl_security.xml',
+             'security/ir.model.access.csv'],
     'css':[],
     'images': [],
     'demo': [],
