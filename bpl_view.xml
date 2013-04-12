@@ -702,14 +702,12 @@
 		<!-- ############################################# END ESTATE DEDUCTION 
 			##################################################### -->
 
-		<menuitem id="menu_bpl" name="Checkroll/Registration" groups="group_checkroll_manager,group_checkroll_user" />
-		<menuitem id="menu_bpl_ref" name="Reference" parent="menu_bpl"
-			groups="" />
-		<menuitem id="menu_bpl_logic" name="Company Specific" parent="menu_bpl"
-			groups="group_checkroll_manager" />
+		<menuitem id="menu_bpl" name="Checkroll/Registration" groups="group_checkroll_user,group_checkroll_manager" />
+		<menuitem id="menu_bpl_ref" name="Reference" parent="menu_bpl" groups="group_checkroll_manager" />
+		<menuitem id="menu_bpl_logic" name="Company Specific" parent="menu_bpl" groups="group_checkroll_user" />
 
 		<menuitem id="menu_bpl_worker_registration" name="Worker Registration"
-			parent="menu_bpl" action="bpl_worker_registration_action" sequence="1"   />
+			parent="menu_bpl" action="bpl_worker_registration_action" sequence="1" />
 		<menuitem id="menu_bpl_officer_registration" name="Officer Registration"
 			parent="menu_bpl" action="bpl_officer_registration_action" sequence="2" />
 		<menuitem id="menu_bpl_work_offer" name="Work Offer" parent="menu_bpl"
