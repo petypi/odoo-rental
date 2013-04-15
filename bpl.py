@@ -2,17 +2,17 @@ from openerp.osv import fields, osv
 import random
 
 class res_users(osv.osv):
-
+    
     def create(self, cr, uid, values, context=None):
         res_users_obj = self.pool.get('res.users')
-        # res_users_obj.create(cr, uid, values)
-        return res_users_obj.create(cr, uid, {        'login': values['login'],
-                                                      'password': values['password'],
-                                                      'company_id': values['bpl_company_id'],
-                                                      'partner_id': values['officer_id'],
-                                                      'name': values['login']
-                                                      })
-                
+        res_users_obj.create(cr, uid, {
+            'login': values['login'],
+            'password': values['password'],
+            'company_id': values['bpl_company_id'],
+            'partner_id': values['officer_id'],
+            'name': values['login'],
+        }, context=context)
+        return super(res_users, self).create(cr, uid, values, context=context)
 
     # _inherit = "res.users"
     _name = "bpl.res.users"
