@@ -1,7 +1,35 @@
 from openerp.osv import fields, osv
 import random
 
+class res_users(osv.osv):
+
+    def create(self, cr, uid, values, context=None):
+        res_users_obj = self.pool.get('res.users')
+        # res_users_obj.create(cr, uid, values)
+        return res_users_obj.create(cr, uid, {        'login': values['login'],
+                                                      'password': values['password'],
+                                                      'company_id': values['bpl_company_id'],
+                                                      'partner_id': values['officer_id'],
+                                                      'name': values['login']
+                                                      })
+                
+
+    # _inherit = "res.users"
+    _name = "bpl.res.users"
+    _columns = {
+        'bpl_company_id':fields.many2one('bpl.company.n.registration', 'Company'),
+        'bpl_estate_id':fields.many2one('bpl.estate.n.registration', 'Estate', help='Estate', domain="[('company_id','=',bpl_company_id)]"),
+        'officer_id':fields.many2one('bpl.officer', 'User', domain="[('bpl_company_id','=',bpl_company_id)]"),
+        'login': fields.char('Login', size=20),
+        'password': fields.char('Password', size=20),
+    }
+    
+    
+res_users()
+
+    
 class bpl_officer_registration(osv.osv):
+    
     _name = "bpl.officer"
     _description = "Officer registration details"
     _columns = {
@@ -366,10 +394,8 @@ class company_estate_division(osv.osv):
         'bpl_company_id':fields.many2one('bpl.company.n.registration', 'Company', help='Company'),
         'bpl_estate_id':fields.many2one('bpl.estate.n.registration', 'Estate', help='Estate'),
         'bpl_division_id':fields.many2one('bpl.division.n.registration', 'Division', help='Division'),
-
         'company_id': fields.function(_get_address_data, fnct_inv=_set_address_data, type='many2one', relation='bpl.company.n.registration', string="Country New",
         multi='address'),
-
         'state_id': fields.function(_get_address_data, fnct_inv=_set_address_data, type='many2one', domain="[('company_id', '=', bpl_company_id)]",
         relation='bpl.estate.n.registration', string="Estate New"),
                 }
@@ -648,6 +674,18 @@ deduction_registration()
 
 
 class bank_registration(osv.osv):
+    
+    def on_change_name(self, cr, uid, ids, name):
+        branch_v = {}
+        branch_list_data = []
+        if name:
+            bank_id = self.pool.get('bpl.bank.registration').search(cr, uid, [('name', '=', name)])
+            branch_ids = self.pool.get('bpl.branch.registration').search(cr, uid, [('bank_id', '=', bank_id)])
+            for record in self.pool.get('bpl.branch.registration').browse(cr, uid, branch_ids):
+                branch_list_data.append({'branch_id': record.id, 'name': record.name})
+            branch_v['branch_id'] = branch_list_data
+            return {'value':branch_v}
+    
     _name = "bpl.bank.registration"
     _description = "Bank"
     _columns = {
@@ -668,12 +706,70 @@ class branch_registration(osv.osv):
 branch_registration()
 
 class bank_branch_registration(osv.osv):
+    
     _name = "bpl.bank.branch.registration"
     _description = "Bank/Branch"
     _columns = {
-        'bank_id': fields.related('branch_id', 'bank_id', type='many2one', relation='bpl.bank.registration', string='Bank'),
+        'bank_id': fields.many2one('bpl.bank.registration', 'Bank Name'),
         'branch_id': fields.many2one('bpl.branch.registration', 'Branch'),
         'name': fields.char('Code', size=128, required=True),
     }
 
 bank_branch_registration()
+
+#########################################################################################################################################
+
+class cash_advance_register(osv.osv):
+    _name = "bpl.cash.advance.register"
+    _description = "Cash Advance Register"
+    _columns = {
+        'bpl_company_id':fields.many2one('bpl.company.n.registration', 'Company', help='Company'),
+        'bpl_estate_id':fields.many2one('bpl.estate.n.registration', 'Estate', help='Estate', domain="[('company_id','=',bpl_company_id)]"),
+        'bpl_division_id':fields.many2one('bpl.division.n.registration', 'Division', help='Division', domain="[('estate_id','=',bpl_estate_id)]"),
+        'worker_id': fields.many2one('bpl.worker', 'Worker'),
+        'date': fields.date('Date'),
+        'amount': fields.float('Amount'),
+    }
+
+cash_advance_register()
+
+class loan_register(osv.osv):
+    _name = "bpl.loan.register"
+    _description = "Loan Register"
+    _columns = {
+        'worker_id': fields.many2one('bpl.worker', 'Worker'),
+        'loan_amount': fields.float('Amount'),
+        'installment': fields.float('Installment'),
+        'paid_amount': fields.float('Paid Amount'),
+        'start_date': fields.date('Start Date'),
+        'end_date': fields.date('End Date'),
+    }
+
+loan_register()
+
+class relegious_places(osv.osv):
+    _name = "bpl.relegious.places"
+    _description = "Religious Places"
+    _columns = {
+        'religion_id': fields.many2one('bpl.religion', 'Religion'),
+        'festival_id': fields.many2one('bpl.festival', 'Festival'),
+        'relegious_place': fields.char('Place', size=128, required=True),
+        'relegious_location': fields.char('Location', size=128, required=True),
+    }
+
+relegious_places()
+
+class festival_advance_register(osv.osv):
+    _name = "bpl.festival.advance.register"
+    _description = "Festival Advance Register"
+    _columns = {
+        'worker_id': fields.many2one('bpl.worker', 'Worker'),
+        'festival_id': fields.many2one('bpl.festival', 'Festival'),
+        'festival_advance': fields.float('Amount'),
+        'installment': fields.float('Installment'),
+        'paid_amount': fields.float('Paid Amount'),
+        'start_date': fields.date('Start Date'),
+        'end_date': fields.date('End Date'),
+    }
+
+festival_advance_register()
