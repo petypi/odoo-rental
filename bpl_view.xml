@@ -1,6 +1,6 @@
 <?xml version="1.0"?>
 <openerp>
-    <data>
+	<data>
 
 		<record id="bpl_officer_registration_tree" model="ir.ui.view">
 			<field name="name">bpl.officer.tree</field>
@@ -284,6 +284,24 @@
 
 
 		<!-- ####################################################Work Offer#################################################### -->
+
+
+		<record id="bpl_work_offer_tree" model="ir.ui.view">
+			<field name="name">bpl.work.offer.tree</field>
+			<field name="model">bpl.work.offer</field>
+			<field name="arch" type="xml">
+				<tree string="bpl_work_offer">
+					<field name="bpl_division_id" />
+					<field name="date_of_offer" />
+					<field name='payment_type' />
+					<field name='select_by' />
+					<field name='selected_tea_workers_line_ids' />
+					<field name='selected_rubber_workers_line_ids' />
+					<field name='selected_sundry_workers_line_ids' />
+				</tree>
+			</field>
+		</record>
+
 		<record model="ir.ui.view" id="bpl_work_offer_form">
 			<field name="name">bpl.work.offer.form</field>
 			<field name="model">bpl.work.offer</field>
@@ -292,6 +310,7 @@
 					<sheet>
 						<group>
 							<group>
+								<field name='work_update_id' invisible="1" />
 								<field name='bpl_company_id' invisible="0" />
 								<field name='bpl_estate_id' />
 								<field name='bpl_division_id' on_change="on_change_division(bpl_division_id)" />
@@ -366,7 +385,7 @@
 			<field name="name">bpl.work.offer.action</field>
 			<field name="res_model">bpl.work.offer</field>
 			<field name="view_type">form</field>
-			<field name="view_mode">form</field>
+			<field name="view_mode">tree,form</field>
 		</record>
 
 		<!-- ################################################################################################## -->
@@ -443,10 +462,10 @@
 								<field name='name' on_change="on_change_name(name)" />
 							</group>
 						</group>
-						<div name="Branch Data Div"></div>
-						<separator string='Branch Data Seperator' />
+						<div name="Branch Data"></div>
+						<separator string='Branch Data' />
 						<notebook>
-							<page string="Branches Page">
+							<page string="Branches">
 								<field name='branch_id' nolabel='1'>
 									<tree string='List' editable='bottom'>
 										<field name='id' invisible="1" />
@@ -506,7 +525,7 @@
 							<group>
 
 								<field name='bpl_company_id' invisible="0" />
-								<field name='bpl_estate_id' />
+								<field name='bpl_estate_id' on_change="on_change_estate(bpl_estate_id)" />
 								<field name='bpl_division_id' />
 							</group>
 							<group>
@@ -515,8 +534,24 @@
 								<field name='casual_eligible' />
 							</group>
 						</group>
-						<div name="Worker Selection"></div>
-						<separator string='Select Work Offers' />
+
+						<div name="Work Offers"></div>
+						<separator string='Work Offers' />
+						<notebook>
+							<page string="Work Offers">
+								<field name='work_offer_id' nolabel='1'>
+									<tree string='List'>
+										<field name="id" invisible="1" />
+										<field name="bpl_division_id" readonly="1" />
+										<field name="date_of_offer" readonly="1" />
+										<field name='payment_type' readonly="1" />
+										<field name='select_by' readonly="1" />
+									</tree>
+								</field>
+							</page>
+						</notebook>
+						<div name="Update Work"></div>
+						<separator string='Update Work' />
 						<notebook>
 							<page string="Tea Workers">
 								<field name='selected_tea_workers_update_line_ids'
@@ -530,10 +565,7 @@
 										<field name='tea_over_kgs' />
 									</tree>
 								</field>
-								<group class='oe_subtotal_footer oe_right'>
-								</group>
-								<br />
-								<br />
+
 							</page>
 							<page string="Rubber Workers">
 								<field name='selected_rubber_workers_update_line_ids'
@@ -548,10 +580,7 @@
 										<field name='rubber_scrap_kgs' />
 									</tree>
 								</field>
-								<group class='oe_subtotal_footer oe_right'>
-								</group>
-								<br />
-								<br />
+
 							</page>
 							<page string="Sundry Workers">
 								<field name='selected_sundry_workers_update_line_ids'
@@ -563,10 +592,7 @@
 										<field name='sundry_work_id' />
 									</tree>
 								</field>
-								<group class='oe_subtotal_footer oe_right'>
-								</group>
-								<br />
-								<br />
+
 							</page>
 						</notebook>
 					</sheet>
@@ -751,18 +777,52 @@
 			<field name="view_type">form</field>
 			<field name="view_mode">form</field>
 		</record>
-
 		<!-- ############################################# END ESTATE DEDUCTION 
 			##################################################### -->
 
-		<menuitem id="menu_bpl" name="Checkroll/Registration"
-			groups="group_checkroll_user,group_checkroll_manager" />
-		<menuitem id="menu_bpl_ref" name="Reference" parent="menu_bpl"
-			groups="group_checkroll_manager" />
-		<menuitem id="menu_bpl_logic" name="Company Specific" parent="menu_bpl"
-			groups="group_checkroll_user" />
-		<menuitem id="menu_bpl_registers" name="Registers" parent="menu_bpl"
-			groups="" />
+		<record id="action_res_company_form" model="ir.actions.act_window">
+			<field name="name">Companies New</field>
+			<field name="type">ir.actions.act_window</field>
+			<field name="res_model">res.company</field>
+			<field name="view_type">form</field>
+		</record>
+		<record id="action_res_company_tree" model="ir.actions.act_window">
+			<field name="name">Company's Structure</field>
+			<field name="type">ir.actions.act_window</field>
+			<field name="res_model">res.company</field>
+			<field name="domain">[('parent_id','=',False)]</field>
+			<field name="view_type">tree</field>
+		</record>
+
+		<record id="action_res_users" model="ir.actions.act_window">
+			<field name="name">Users</field>
+			<field name="type">ir.actions.act_window</field>
+			<field name="res_model">res.users</field>
+			<field name="view_type">form</field>
+		</record>
+
+		<record model="ir.ui.view" id="view_users_inherit_form">
+			<field name="name">res.users.form.inherit</field>
+			<field name="inherit_id" ref="base.view_users_form" />
+			<field name="model">res.users</field>
+			<field name="type">form</field>
+		</record>
+
+
+
+		<!-- ############################################# START MENU SECTION ##################################################### -->
+
+		<menuitem id="menu_bpl" name="Checkroll/Registration" />
+		<menuitem id="menu_bpl_ref" name="Reference" parent="menu_bpl" />
+		<menuitem id="menu_bpl_logic" name="Company Specific" parent="menu_bpl" />
+		<menuitem id="menu_bpl_registers" name="Registers" parent="menu_bpl" />
+
+		<menuitem action="action_res_company_form" id="menu_action_res_company_form"
+			parent="menu_bpl_registers" />
+		<menuitem action="action_res_company_tree" id="menu_action_res_company_tree"
+			parent="menu_bpl_registers" />
+		<menuitem action="action_res_users" id="menu_action_res_users"
+			parent="menu_bpl_registers" />
 
 		<menuitem id="menu_bpl_worker_registration" name="Worker Registration"
 			parent="menu_bpl" action="bpl_worker_registration_action" sequence="1" />
