@@ -327,6 +327,7 @@ class bpl_work_offer(osv.osv):
         'selected_rubber_workers_line_ids': fields.one2many('bpl.selected.rubber.workers.line', 'rubber_line_worker_id', 'Rubber Workers', ondelete="cascade"),
         'selected_sundry_workers_line_ids': fields.one2many('bpl.selected.sundry.workers.line', 'sundry_line_worker_id', 'Sundry Workers', ondelete="cascade"),
         'is_confirmed': fields.boolean('Is Confirmed', help="confirmed"),
+        'work_update_id':fields.many2one('bpl.work.update', 'Work Update'),
     }
 
     _defaults = {
@@ -442,6 +443,24 @@ class sundry_work_registration(osv.osv):
 sundry_work_registration()
 
 class bpl_work_update(osv.osv):
+    
+    def on_change_estate(self, cr, uid, ids, estate_id, context=None):
+        work_offer_v = {}
+        work_offer_list_data = []
+        if estate_id:
+            estate_object = self.pool.get('bpl.estate.n.registration')
+            estate_browse = estate_object.browse(cr, uid, estate_id, context=context)
+            result_estate_id = estate_browse.id
+            
+            work_offer_ids = self.pool.get('bpl.work.offer').search(cr, uid, [('bpl_estate_id', '=', result_estate_id)])
+            for record in self.pool.get('bpl.work.offer').browse(cr, uid, work_offer_ids):
+                work_offer_list_data.append({'id': record.id,
+                                             'bpl_division_id': record.bpl_division_id.id,
+                                             'date_of_offer': record.date_of_offer,
+                                             'payment_type': record.payment_type,
+                                             'select_by': record.select_by})
+            work_offer_v['work_offer_id'] = work_offer_list_data
+            return {'value':work_offer_v}
 
     _name = "bpl.work.update"
     _description = "BPL Work Update"
@@ -451,6 +470,7 @@ class bpl_work_update(osv.osv):
         'bpl_division_id':fields.many2one('bpl.division.n.registration', 'Division', help='Division', domain="[('estate_id','=',bpl_estate_id)]"),
         'ref_no': fields.char('Reference No', size=10,),
         'offered_date': fields.date('Offered Date'),
+        'work_offer_id':fields.one2many('bpl.work.offer', 'work_update_id', 'Work Offer'),
         'gang_no': fields.char('Gang No', size=10, required=True),
         'selected_tea_workers_update_line_ids': fields.one2many('bpl.selected.tea.workers.update.line', 'work_id', 'Tea Work Offers', ondelete="cascade"),
         'selected_rubber_workers_update_line_ids': fields.one2many('bpl.selected.rubber.workers.update.line', 'work_id', 'Rubber Offers', ondelete="cascade"),
