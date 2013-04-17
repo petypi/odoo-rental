@@ -548,10 +548,6 @@ class fixed_deduction_ids(osv.osv):
     _columns = {
                 'deduction_id':fields.many2one('bpl.deduction.master.data', 'Fixed Deductions', ondelete='cascade'),
                 'deduction_name':fields.many2one('bpl.deduction.registration', 'Deduction'),
-                'deduction_type': fields.selection([('rate', 'Rate'), ('amount', 'Amount')], 'Deduction Type'),
-                'rate':fields.float('Rate'),
-                'amount':fields.float('Amount'),
-                'active': fields.boolean('Active', help="Active"),
         }
 
 fixed_deduction_ids()
@@ -562,7 +558,6 @@ class variable_deduction_ids(osv.osv):
     _columns = {
                 'deduction_id':fields.many2one('bpl.deduction.master.data', 'Variable Deductions', ondelete='cascade'),
                 'deduction_name':fields.many2one('bpl.deduction.registration', 'Deduction'),
-                'active': fields.boolean('Active', help="Active"),
         }
 
 variable_deduction_ids()
@@ -582,14 +577,29 @@ class special_deduction_ids(osv.osv):
 special_deduction_ids()
 
 class deduction_estate_data(osv.osv):
+    
+    def on_change_estate(self, cr, uid, ids, estate_id):
+        fixed_v = {}
+        fixed_list_data = []
+        
+        if estate_id:            
+            
+            master_deduction_id = self.pool.get('bpl.deduction.master.data').search(cr, uid, [('bpl_estate_id', '=', estate_id)])
+            master_deduction_obj = self.pool.get('bpl.deduction.master.data').browse(cr, uid, master_deduction_id)
+            for deduction_record in master_deduction_obj[0].fixed_deduction_ids:
+                fixed_list_data.append({'deduction_id':deduction_record.deduction_id.id, 'deduction_name': deduction_record.deduction_name.id})
+            fixed_v['fixed_deduction_ids'] = fixed_list_data
+            return {'value':fixed_v}
+    
+    
     _name = 'bpl.deduction.estate.data'
     _description = 'BPL Deduction Estate Data'
     _columns = {
                 'bpl_company_id':fields.many2one('bpl.company.n.registration', 'Company', help='Company'),
                 'bpl_estate_id':fields.many2one('bpl.estate.n.registration', 'Estate', help='Estate', domain="[('company_id','=',bpl_company_id)]"),
-                'fixed_deduction_ids': fields.one2many('bpl.fixed.deductions', 'deduction_id', 'Fixed Deductions', ondelete="cascade"),
-                'variable_deduction_ids': fields.one2many('bpl.variable.deductions', 'deduction_id', 'Variable Deductions', ondelete="cascade"),
-                'special_deduction_ids': fields.one2many('bpl.special.deductions', 'deduction_id', 'Special Deductions', ondelete="cascade"),
+                'fixed_deduction_ids': fields.one2many('bpl.estate.fixed.deductions', 'deduction_id', 'Fixed Deductions', ondelete="cascade"),
+                'variable_deduction_ids': fields.one2many('bpl.variable.estate.deductions', 'deduction_id', 'Variable Deductions', ondelete="cascade"),
+                'special_deduction_ids': fields.one2many('bpl.special.estate.deductions', 'deduction_id', 'Special Deductions', ondelete="cascade"),
                 }
     _defaults = {}
 deduction_estate_data()
@@ -600,10 +610,6 @@ class fixed_estate_deduction_ids(osv.osv):
     _columns = {
                 'deduction_id':fields.many2one('bpl.deduction.estate.data', 'Fixed Estate Deductions'),
                 'deduction_name':fields.many2one('bpl.deduction.registration', 'Deduction'),
-                'deduction_type': fields.selection([('rate', 'Rate'), ('amount', 'Amount')], 'Deduction Type'),
-                'rate':fields.float('Rate'),
-                'amount':fields.float('Amount'),
-                'active': fields.boolean('Active', help="Active"),
         }
 
 fixed_estate_deduction_ids()
@@ -614,7 +620,6 @@ class variable_estate_deduction_ids(osv.osv):
     _columns = {
                 'deduction_id':fields.many2one('bpl.deduction.estate.data', 'Variable Deductions'),
                 'deduction_name':fields.many2one('bpl.deduction.registration', 'Deduction'),
-                'active': fields.boolean('Active', help="Active"),
         }
 
 variable_estate_deduction_ids()
@@ -624,11 +629,6 @@ class special_estate_deduction_ids(osv.osv):
     _description = 'Estate Special Deductions'
     _columns = {
                 'deduction_id':fields.many2one('bpl.deduction.master.data', 'Special Deductions', ondelete='cascade'),
-                'special_deduction_type': fields.selection([('bank', 'Bank'), ('union', 'Union'), ('insurance', 'Insurance'), ('loan', 'Loan')], 'Deduct for'),
-                'bank_id': fields.many2one('bpl.bank.deductions', 'Bank Deductions'),
-                'union_id': fields.many2one('bpl.union.deductions', 'Union Deductions'),
-                'insurance_id': fields.many2one('bpl.insurance.deductions', 'Insurance Deductions'),
-                'loan_id': fields.many2one('bpl.loan.deductions', 'Loan Deductions'),
         }
 
 special_estate_deduction_ids()
@@ -641,7 +641,6 @@ class bank_deductions(osv.osv):
                 'branch_id': fields.many2one('bpl.branch.registration', 'Branch', ondelete='cascade', domain="[('bank_id','=',bank_id)]"),
                 'name': fields.char('Deduction', size=256),
                 'amount':fields.float('Amount'),
-                'active': fields.boolean('Active'),
                 }
 
 bank_deductions()
@@ -653,7 +652,6 @@ class union_deductions(osv.osv):
                 'union_id': fields.many2one('bpl.union', 'Union', help='Union'),
                 'name': fields.char('Deduction', size=256),
                 'amount':fields.float('Amount'),
-                'active': fields.boolean('Active'),
                 }
 
 union_deductions()
@@ -665,7 +663,6 @@ class insurance_deductions(osv.osv):
                 'name': fields.char('Insurance Name', size=256),
                 'policy_no': fields.char('Policy No', size=256),
                 'amount':fields.float('Amount'),
-                'active': fields.boolean('Active'),
                 }
 
 insurance_deductions()
@@ -678,7 +675,6 @@ class loan_deductions(osv.osv):
                 'loan_amount':fields.float('Loan Amount'),
                 'installment_amount':fields.float('Installment Amount'),
                 'remain_amount':fields.float('Remain Amount'),
-                'active': fields.boolean('Active'),
                 }
 
 loan_deductions()
