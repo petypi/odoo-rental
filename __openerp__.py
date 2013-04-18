@@ -9,9 +9,11 @@
     """,
     'data': [
              'bpl_worker_registration_sequence.xml',
-             'bpl_view.xml',
              'security/bpl_security.xml',
-             'security/ir.model.access.csv'],
+             'security/ir.model.access.csv',
+             'bpl_view.xml',
+             'company_view.xml',
+             'individual_deduction.xml'],
     'css':[],
     'images': [],
     'demo': [],
