@@ -7,10 +7,11 @@
 			<field name="model">bpl.officer</field>
 			<field name="arch" type="xml">
 				<tree string="bpl_officer_registration">
-					<field name="job_position" />
 					<field name="name" />
-					<field name="bpl_company_id" />
+					<field name="job_position" />
 					<field name="work_for" />
+					<field name="bpl_company_id" />
+					<field name="bpl_estate_id" />
 					<field name="mobile" />
 				</tree>
 			</field>
@@ -18,7 +19,7 @@
 
 
 		<record model="ir.actions.act_window" id="bpl_officer_registration_action">
-			<field name="name">bpl.officer.action</field>
+			<field name="name">Officer Registration</field>
 			<field name="res_model">bpl.officer</field>
 		</record>
 
@@ -28,11 +29,12 @@
 			<field name="arch" type="xml">
 				<form string="bpl_officer_registration" version="7.0">
 					<sheet>
-						<field name="bpl_company_id" invisible="0" placeholder="Comapany"
-							style="width: 50%%" />
-						<field name="bpl_estate_id" invisible="0" placeholder="Estate"
-							style="width: 50%%" />
-						<field name="bpl_division_id" invisible="0" placeholder="Division"
+						<field name="work_for" style="width: 50%%" />
+						<field name="bpl_company_id" invisible="0" placeholder=""
+							readonly="1" style="width: 50%%" />
+						<field name="bpl_estate_id" placeholder="Estate"
+							attrs="{'invisible':[('work_for','=','head_office')]}" style="width: 50%%" />
+						<field name="bpl_division_id" invisible="1" placeholder="Division"
 							style="width: 50%%" />
 
 						<div class="oe_title">
@@ -69,8 +71,7 @@
 								<field name="mobile" placeholder="e.g. +94 777 333 000" />
 								<field name="fax" placeholder="e.g. +94 112 333 222" />
 								<field name="email" widget="email" placeholder="e.g. infor@bellvantage.com" />
-								<field name="job_position" placeholder="Finance Manager" />
-								<field name="work_for" />
+								<field name="job_position" widget="selection" />
 								<field name="is_active" />
 								<field name="current_status" attrs="{'invisible':[('is_active','=',False)]}" />
 
@@ -91,23 +92,16 @@
 					<sheet>
 						<group>
 							<group>
-								<field name="bpl_company_id" />
+								<field name="bpl_company_id" readonly="1" />
 								<field name="bpl_estate_id" on_change="on_change_estate(bpl_estate_id)" />
 								<field name="bpl_division_id" on_change="on_change_division(bpl_division_id)" />
 								<field name="register_no" style="width: 30%%" />
 								<field name="employer_no" style="width: 30%%" />
 								<field name="epf_no" style="width: 30%%" />
 								<field name="emp_no" style="width: 30%%" />
-								<field name="nic_no" />
+								<field name="nic_no" placeholder="845148502V" />
 							</group>
-							<group>
 
-								<field name="name" />
-								<field name="date_of_birth" />
-								<field name="gender" />
-								<field name="is_married" />
-								<field name="spouse_name" attrs="{'invisible':[('is_married','=',False)]}" />
-							</group>
 							<group>
 								<field name="father_name" />
 								<field name="mother_name" />
@@ -116,6 +110,14 @@
 								<field name="religion_id" />
 								<field name="festival_id" invisible="1" />
 								<field name="date_of_approval" invisible="1" />
+							</group>
+							<group>
+
+								<field name="name" />
+								<field name="date_of_birth" />
+								<field name="gender" />
+								<field name="is_married" />
+								<field name="spouse_name" attrs="{'invisible':[('is_married','=',False)]}" />
 							</group>
 							<group>
 								<field name="default_work" />
@@ -144,10 +146,12 @@
 			<field name="arch" type="xml">
 				<tree string="bpl_worker_registration">
 					<field name="name" />
-					<field name="register_no" />
-					<field name="nic_no" />
+					<field name="emp_no" />
+					<field name="epf_no" />
+					<field name="bpl_estate_id" />
 					<field name="bpl_division_id" />
 					<field name="default_work" />
+					<field name="status" />
 				</tree>
 			</field>
 		</record>
@@ -311,18 +315,24 @@
 						<group>
 							<group>
 								<field name='work_update_id' invisible="1" />
-								<field name='bpl_company_id' invisible="0" />
+								<field name='bpl_company_id' invisible="0" readonly="1" />
 								<field name='bpl_estate_id' />
 								<field name='bpl_division_id' on_change="on_change_division(bpl_division_id)" />
+								<field name='sequence_no' readonly="1" />
 								<field name="user_id" invisible="1" />
 								<field name="is_confirmed" invisible="1" />
-							</group>
-							<group>
 								<field name='date_of_offer' />
 								<field name='work_type' />
+							</group>
+							<group>
 								<field name='payment_type' />
 								<field name='select_by' />
 								<field name='no_of_workers' attrs="{'invisible':[('select_by','=','by_name')]}" />
+
+								<field name='norm' />
+								<field name='checkroll_no' />
+								<field name='gang_no' />
+								<field name='field_no' />
 
 							</group>
 						</group>
@@ -332,46 +342,64 @@
 						<notebook attrs="{'invisible':[('select_by','=','by_count')]}">
 							<page string="Tea Workers" attrs="{'readonly':[('work_type','!=','tea')]}">
 								<field name='selected_tea_workers_line_ids' nolabel='1'>
-									<tree string='List' editable='bottom'>
+									<tree string='List' editable='bottom' delete="false">
 										<field name='tea_line_worker_id' invisible="1" />
-										<field name='worker_emp_no' />
-										<field name='worker_id' />
+										<field name='worker_emp_no' on_change="on_change_worker_emp_no(worker_emp_no)" />
+										<field name='worker_id' on_change="on_change_worker_id(worker_id)" />
 										<field name='is_selected' />
 									</tree>
 								</field>
-								<group class='oe_subtotal_footer oe_right'>
-									<field name='total_workers' />
+								<group class="oe_subtotal_footer oe_right">
+									<div>
+										<label for="amount_total" string="Total Workers" />
+										<button name="button_total" string="(update)" type="object"
+											class="oe_edit_only oe_link" />
+									</div>
+									<field name="total_workers" nolabel="1" />
 								</group>
+								<div class="oe_clear" />
 								<br />
 								<br />
 							</page>
-							<page string="Rubber Workers" attrs="{'readonly':[('work_type','=','rubber')]}">
+							<page string="Rubber Workers" delete="false">
 								<field name='selected_rubber_workers_line_ids' nolabel='1'>
 									<tree string='List' editable='bottom'>
 										<field name='rubber_line_worker_id' invisible="1" />
-										<field name='worker_emp_no' />
-										<field name='worker_id' />
+										<field name='worker_emp_no' on_change="on_change_worker_emp_no(worker_emp_no)" />
+										<field name='worker_id' on_change="on_change_worker_id(worker_id)" />
 										<field name='is_selected' />
 									</tree>
 								</field>
-								<group class='oe_subtotal_footer oe_right'>
-									<field name='total_workers' />
+								<group class="oe_subtotal_footer oe_right">
+									<div>
+										<label for="amount_total" string="Total Workers" />
+										<button name="button_total" string="(update)" type="object"
+											class="oe_edit_only oe_link" />
+									</div>
+									<field name="total_workers" nolabel="1" />
 								</group>
+								<div class="oe_clear" />
 								<br />
 								<br />
 							</page>
-							<page string="Sundry Workers" attrs="{'readonly':[('work_type','=','sundry')]}">
+							<page string="Sundry Workers" delete="false">
 								<field name='selected_sundry_workers_line_ids' nolabel='1'>
 									<tree string='List' editable='bottom'>
 										<field name='sundry_line_worker_id' invisible="1" />
-										<field name='worker_emp_no' />
-										<field name='worker_id' />
+										<field name='worker_emp_no' on_change="on_change_worker_emp_no(worker_emp_no)" />
+										<field name='worker_id' on_change="on_change_worker_id(worker_id)" />
 										<field name='is_selected' />
 									</tree>
 								</field>
-								<group class='oe_subtotal_footer oe_right'>
-									<field name='total_workers' />
+								<group class="oe_subtotal_footer oe_right">
+									<div>
+										<label for="amount_total" string="Total Workers" />
+										<button name="button_total" string="(update)" type="object"
+											class="oe_edit_only oe_link" />
+									</div>
+									<field name="total_workers" nolabel="1" />
 								</group>
+								<div class="oe_clear" />
 								<br />
 								<br />
 							</page>
@@ -428,23 +456,23 @@
 		<!-- ,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,, -->
 
 		<record model="ir.actions.act_window" id="bpl_bank_deductions_action">
-			<field name="name">bpl.bank.deductions</field>
-			<field name="res_model">bpl.bank.deductions</field>
+			<field name="name">bpl.bank.deductions.m</field>
+			<field name="res_model">bpl.bank.deductions.m</field>
 		</record>
 
 		<record model="ir.actions.act_window" id="bpl_union_deductions_action">
-			<field name="name">bpl.union.deductions</field>
-			<field name="res_model">bpl.union.deductions</field>
+			<field name="name">bpl.union.deduction.m</field>
+			<field name="res_model">bpl.union.deduction.m</field>
 		</record>
 
 		<record model="ir.actions.act_window" id="bpl_insurance_deductions_action">
-			<field name="name">bpl.insurance.deductions</field>
-			<field name="res_model">bpl.insurance.deductions</field>
+			<field name="name">bpl.insurance.deduction.m</field>
+			<field name="res_model">bpl.insurance.deduction.m</field>
 		</record>
 
 		<record model="ir.actions.act_window" id="bpl_loan_deductions_action">
-			<field name="name">bpl.loan.deductions</field>
-			<field name="res_model">bpl.loan.deductions</field>
+			<field name="name">bpl.loan.deduction.m</field>
+			<field name="res_model">bpl.loan.deduction.m</field>
 		</record>
 		<record model="ir.actions.act_window" id="bpl_bank_registration_action">
 			<field name="name">bpl.bank.registration</field>
@@ -508,10 +536,6 @@
 		</record>
 
 
-		<record model="ir.actions.act_window" id="bpl_users_action">
-			<field name="name">bpl.res.users</field>
-			<field name="res_model">bpl.res.users</field>
-		</record>
 
 
 		<!-- #################################################### Work Update #################################################### -->
@@ -524,7 +548,7 @@
 						<group>
 							<group>
 
-								<field name='bpl_company_id' invisible="0" />
+								<field name='bpl_company_id' invisible="0" readonly="1" />
 								<field name='bpl_estate_id' on_change="on_change_estate(bpl_estate_id)" />
 								<field name='bpl_division_id' />
 							</group>
@@ -621,7 +645,7 @@
 						<group>
 							<group>
 								<field name='based_on' />
-								<field name='bpl_company_id' />
+								<field name='bpl_company_id' readonly="1" />
 								<field name='bpl_estate_id' attrs="{'invisible':[('based_on','=','company')]}" />
 								<field name='bpl_division_id'
 									attrs="{'invisible':['|',('based_on','=','company'),('based_on','=','estate')]}" />
@@ -707,8 +731,8 @@
 					<sheet>
 						<group>
 							<group>
-								<field name='bpl_company_id' />
-								<field name='bpl_estate_id' on_change="on_change_estate(bpl_estate_id)"/>
+								<field name='bpl_company_id' readonly="1" />
+								<field name='bpl_estate_id' on_change="on_change_estate(bpl_estate_id)" />
 							</group>
 						</group>
 						<div name="Deduction Estate Data"></div>
@@ -738,6 +762,11 @@
 								<field name='special_deduction_ids' nolabel='1'>
 									<tree string='List' editable='bottom'>
 										<field name='deduction_id' invisible="1" />
+										<field name='special_deduction_type' />
+										<field name='bank_deduction_id' />
+										<field name='union_deduction_id' />
+										<field name='insurance_deduction_id' />
+										<field name='loan_deduction_id' />
 									</tree>
 								</field>
 								<br />
@@ -772,10 +801,7 @@
 		<menuitem id="menu_bpl_logic" name="Company Specific" parent="menu_bpl" />
 		<menuitem id="menu_bpl_registers" name="Registers" parent="menu_bpl" />
 
-		<menuitem action="action_res_company_form" id="menu_action_res_company_form"
-			parent="menu_bpl_registers" groups="group_checkroll_user" />
-		<menuitem action="base.action_res_users" id="menu_action_res_users"
-			parent="menu_bpl_registers" groups="group_checkroll_manager" />
+
 
 		<menuitem id="menu_bpl_worker_registration" name="Worker Registration"
 			parent="menu_bpl" action="bpl_worker_registration_action" sequence="1" />
@@ -790,8 +816,10 @@
 		<menuitem id="menu_bpl_deduction_estate_data" name="Deduction Estate Data"
 			parent="menu_bpl" action="bpl_deduction_estate_data_action" sequence="6" />
 
-		<menuitem id="menu_bpl_users" name="Users" parent="menu_bpl"
-			action="bpl_users_action" sequence="6" />
+		<menuitem action="action_res_company_form" id="menu_action_res_company_form"
+			parent="menu_bpl" groups="group_checkroll_user" sequence="8" />
+		<menuitem action="base.action_res_users" id="menu_action_res_users"
+			parent="menu_bpl" groups="group_checkroll_manager" sequence="9" />
 
 		<menuitem id="menu_bpl_religion_registration" name="Religion Registration"
 			parent="menu_bpl_ref" action="bpl_religion_registration_action" />
