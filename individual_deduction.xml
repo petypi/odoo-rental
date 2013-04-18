@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="utf-8"?>
+<openerp>
+  <data>
+		<record model="ir.ui.view" id="bpl_deduction_individual_data">
+			<field name="name">bpl.deduction.individuals.data.form</field>
+			<field name="model">bpl.deduction.individuals.data</field>
+			<field name="arch" type="xml">
+				<form string='bpl_deduction_individual_data' version='7.0'>
+					<sheet>
+						<group>
+							<group>
+								<field name='based_on' />
+								<field name='bpl_company_id' readonly="1" />
+								<field name='bpl_estate_id' attrs="{'invisible':[('based_on','=','company')]}"
+									on_change="on_change_estate(bpl_estate_id)" />
+								<field name='bpl_worker_id' />
+							</group>
+						</group>
+						<div name="Individual Deductions"></div>
+						<separator string='Individual Deductions' />
+						<notebook>
+							<page string="Fixed Deductions">
+								<field name='fixed_deduction_ids' nolabel='1'>
+									<tree string='List' editable='bottom'>
+										<field name='deduction_id' invisible="1" />
+										<field name='deduction_name' />
+									</tree>
+								</field>
+							</page>
+							<page string="Variable Deductions">
+								<field name='variable_deduction_ids' nolabel='1'>
+									<tree string='List' editable='bottom'>
+										<field name='deduction_id' invisible="1" />
+										<field name='deduction_name' />
+									</tree>
+								</field>
+							</page>
+							<page string="Special Deductions">
+								<field name='special_deduction_ids' nolabel='1'>
+									<tree string='List' editable='bottom'>
+										<field name='deduction_id' invisible="1" />
+										<field name='special_deduction_type' />
+										<field name='bank_deduction_id' />
+										<field name='union_deduction_id' />
+										<field name='insurance_deduction_id' />
+										<field name='loan_deduction_id' />
+									</tree>
+								</field>
+								<br />
+								<br />
+							</page>
+						</notebook>
+					</sheet>
+				</form>
+			</field>
+		</record>
+
+
+		<record model="ir.actions.act_window" id="bpl_deduction_individual_data_action">
+			<field name="name">bpl.deduction.individuals.data.action</field>
+			<field name="res_model">bpl.deduction.individuals.data</field>
+			<field name="view_type">form</field>
+			<field name="view_mode">form</field>
+		</record>
+
+		<menuitem id="menu_bpl_deduction_individual_data" name="Individual Deduction"
+			parent="menu_bpl" action="bpl_deduction_individual_data_action"
+			sequence="7" />
+
+	</data>
+</openerp>
