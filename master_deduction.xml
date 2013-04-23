@@ -1,29 +1,30 @@
 <?xml version="1.0" encoding="utf-8"?>
 <openerp>
 	<data>
-		<record model="ir.ui.view" id="bpl_deduction_individual_data">
-			<field name="name">bpl.deduction.individual.data.form</field>
-			<field name="model">bpl.deduction.individual.data</field>
+		<!-- ######################## START DEDUCTION MASTER DATA ######################## -->
+
+		<record model="ir.ui.view" id="bpl_deduction_master_data">
+			<field name="name">bpl.deduction.master.data.form</field>
+			<field name="model">bpl.deduction.master.data</field>
 			<field name="arch" type="xml">
-				<form string='bpl_deduction_individual_data ' version='7.0'>
+				<form string='bpl_deduction_master_data' version='7.0'>
 					<sheet>
 						<group>
 							<group>
+								<field name='based_on' readonly="1" />
 								<field name='bpl_company_id' readonly="1" />
-								<field name='bpl_estate_id' on_change="on_change_estate(bpl_estate_id)" />
-								<field name='worker_id' />
+								<field name='bpl_estate_id' invisible="1" />
+								<field name='bpl_division_id' invisible="1" />
 							</group>
 						</group>
-						<div name="Deduction individual Data"></div>
-						<separator string="Deduction individual Data" />
+						<div name="Deduction Master Data"></div>
+						<separator string='Deduction Master Data' />
 						<notebook>
 							<page string="Fixed Deductions">
 								<field name='fixed_deduction_ids' nolabel='1'>
 									<tree string='List' editable='bottom'>
 										<field name='deduction_id' invisible="1" />
 										<field name='deduction_name' />
-										<field name='amount' />
-										<field name='active' />
 									</tree>
 								</field>
 							</page>
@@ -32,8 +33,6 @@
 									<tree string='List' editable='bottom'>
 										<field name='deduction_id' invisible="1" />
 										<field name='deduction_name' />
-										<field name='amount' />
-										<field name='active' />
 									</tree>
 								</field>
 							</page>
@@ -42,12 +41,6 @@
 									<tree string='List' editable='bottom'>
 										<field name='deduction_id' invisible="1" />
 										<field name='name' />
-										<field name='bank_id' invisible="0" />
-										<field name='branch_id' invisible="0" />
-										<field name='amount' />
-										<field name='start_date' />
-										<field name='end_date' />
-										<field name='active' />
 									</tree>
 								</field>
 							</page>
@@ -56,11 +49,6 @@
 									<tree string='List' editable='bottom'>
 										<field name='deduction_id' invisible="1" />
 										<field name='name' />
-										<field name='total' />
-										<field name='installment' />
-										<field name='start_date' />
-										<field name='end_date' />
-										<field name='active' />
 									</tree>
 								</field>
 							</page>
@@ -69,10 +57,6 @@
 									<tree string='List' editable='bottom'>
 										<field name='deduction_id' invisible="1" />
 										<field name='name' />
-										<field name='insurance_id' invisible="0" />
-										<field name='branch_id' invisible="0" />
-										<field name='installment' />
-										<field name='active' />
 									</tree>
 								</field>
 							</page>
@@ -82,14 +66,20 @@
 			</field>
 		</record>
 
-		<record id="bpl_deduction_individual_data_tree" model="ir.ui.view">
-			<field name="name">bpl.deduction.individual.data.tree</field>
-			<field name="model">bpl.deduction.individual.data</field>
+		<record model="ir.actions.act_window" id="bpl_deduction_master_data_action">
+			<field name="name">Deduction - Master Data</field>
+			<field name="res_model">bpl.deduction.master.data</field>
+			<field name="view_type">form</field>
+			<field name="view_mode">tree,form</field>
+		</record>
+
+
+		<record id="bpl_deduction_master_data_tree" model="ir.ui.view">
+			<field name="name">bpl.deduction.master.data.tree</field>
+			<field name="model">bpl.deduction.master.data</field>
 			<field name="arch" type="xml">
-				<tree string="bpl_deduction_estate_data">
+				<tree string="bpl_deduction_master_data">
 					<field name="bpl_company_id" />
-					<field name="bpl_estate_id" />
-					<field name="worker_id" />
 					<field name="fixed_deduction_ids" />
 					<field name="variable_deduction_ids" />
 					<field name="bank_deduction_ids" />
@@ -98,18 +88,8 @@
 				</tree>
 			</field>
 		</record>
-
-
-		<record model="ir.actions.act_window" id="bpl_deduction_individual_data_action">
-			<field name="name">Deduction - individual Data</field>
-			<field name="res_model">bpl.deduction.individual.data</field>
-			<field name="view_type">form</field>
-			<field name="view_mode">tree,form</field>
-		</record>
-
-		<menuitem id="menu_bpl_deduction_individual_data" name="Individual Deductions"
-			parent="menu_bpl" action="bpl_deduction_individual_data_action"
-			sequence="7" />
+		<menuitem id="menu_bpl_deduction_master_data" name=" Master Deductions"
+			parent="menu_bpl" action="bpl_deduction_master_data_action" sequence="5" />
 
 	</data>
 </openerp>

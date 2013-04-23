@@ -8,17 +8,20 @@
     'description': """
     """,
     'data': [
-             'bpl_worker_registration_sequence.xml',
              'security/bpl_security.xml',
              'security/ir.model.access.csv',
              'bpl_view.xml',
+             'bpl_worker_registration_sequence.xml',
              'company_view.xml',
-             'individual_deduction.xml'],
-    'css':[],
+             'individual_deduction.xml',
+             'estate_deduction.xml',
+             'master_deduction.xml',
+             'static/src/js/bpl_js.js'],
     'images': [],
     'demo': [],
     'installable': True,
     'application' : True,
     'certificate' : '',
     'images': [],
+    'css': [ 'static/src/css/bpl.css' ],
 }
